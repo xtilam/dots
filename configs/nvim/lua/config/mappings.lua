@@ -1,0 +1,16 @@
+local km = vim.keymap
+
+km.set({ "n", "v" }, "<S-i>", "$", { desc = "Go to end line" })
+km.set({ "n", "v" }, "<S-u>", "^", { desc = "Go to end line" })
+km.set({ "n" }, "<C-q>", "<cmd>bd<CR>", { desc = "Close current buffer" })
+km.set({ "n", "v" }, "<C-a>", "gg0vG$", { desc = "Select all" })
+km.set("n", "<leader><leader>", "<cmd>Telescope fd<CR>", { desc = "Telescope fd" })
+km.set("n", "<leader>bb", "<cmd>Telescope buffers<CR>", { desc = "Telescope buffers" })
+km.set({ "n" }, "<leader>ci", "<cmd>ConformInfo<CR>", { desc = "Conform Info" })
+km.set({ "n" }, "<Tab>", ">>", { desc = "Tab line inc" })
+km.set({ "n" }, "<S-Tab>", "<<", { desc = "Tab line dec" })
+km.set("n", "<leader>nn", "<cmd>NoiceTelescope<CR>", { desc = "Notifications" })
+km.set("n", "<leader>nl", "<cmd>NoiceDismiss<CR>", { desc = "Hide all notifications" })
+km.set("t", "<M-v>", [[<C-\><C-n>]], { desc = "Terminal normal mode" })
+km.set("v", "<Tab>", ">gv", { desc = "Visual tab line inc" })
+km.set("v", "<S-Tab>", "<gv", { desc = "Visual tab line dec" })
