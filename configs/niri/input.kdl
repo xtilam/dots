@@ -1,0 +1,27 @@
+input {
+	keyboard {
+		xkb {
+
+		}
+		repeat-delay 200
+		// repeat-rate 40
+		numlock
+	}
+	touchpad {
+		off
+		tap
+		natural-scroll
+	}
+	mouse {
+
+	}
+	trackpoint {
+
+	}
+}
+cursor {
+	xcursor-theme "Vimix-white-cursors"
+	xcursor-size 30
+	hide-when-typing
+}
+

@@ -142,6 +142,9 @@ ff() {
     rm -f "$db_file"
     sync-db
     ;;
+  cd)
+    ff p "get-path-project {}"
+    ;;
   *)
     ff p
     ;;
