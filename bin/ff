@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+script_dir="$(dirname "$(realpath "$BASH_SOURCE")")"
+export data_dir="$script_dir/data"
+export db_file="$data_dir/ff.db"
+export ff_script="$0"
+
+sync-db() {
+  mkdir -p "$data_dir"
+  echo 'create table if not exists projects ( 
+  id integer primary key, 
+  name text unique not null, 
+  path text not null,
+  last_opened datetime default 0 
+)' | sqlite3 "$db_file"
+  echo "Database synced at $db_file"
+  read -p "Press Enter to continue..."
+}
+
+query() {
+  json=""
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+    -j | --json)
+      shift 1
+      json="--json"
+      ;;
+    *)
+      break
+      ;;
+    esac
+  done
+
+  sqlite3 $json "$db_file" "$1"
+}
+
+get-all-projects() {
+  query "select format('%-20s (%s)', name, id) from projects order by last_opened desc" || true
+}
+
+get-project-id() {
+  line="$1"
+  id="${line##*(}"
+  id="${id%)}"
+  echo "$id"
+}
+
+preview-project() {
+  id=$(get-project-id "$1")
+  project=$(query -j "select path, last_opened from projects where id = $id")
+  dir=$(echo "$project" | jq -r '.[0].path')
+  last_opened=$(echo "$project" | jq -r '.[0].last_opened')
+
+  echo "ID   : $id"
+  echo "Path : $dir $([[ ! -d "$dir" ]] && echo -e '\e[31m(not exists)\e[0m')"
+  echo "Last Opened: $last_opened"
+
+  zellij ls | grep -P "^(\x1b\[[0-9;]*m)?\Q${dir//\//\\}\E"
+}
+
+get-path-project() {
+  id=$(get-project-id "$1")
+  query "select path from projects where id = $id"
+}
+
+open-project() {
+  id=$(get-project-id "$1")
+  dir=$(get-path-project "$1")
+  cd "$dir" && $EDITOR .
+  clear
+  query "update projects set last_opened = datetime('now', 'localtime') where id = $id"
+}
+
+yazi-pick-dir() {
+  dir=$(YAZI_CWD="$1" YAZI_TARGET="$1" yazi "$1" --chooser-file=/dev/stdout 2>/dev/null || true)
+  if [[ -n "$dir" ]]; then
+    echo "$dir"
+  fi
+}
+
+update-project() {
+  id=$(get-project-id "$1")
+  project=$(query -j "select path, name from projects where id = $id")
+  name=$(echo "$project" | jq -r '.[0].name')
+  dir=$(echo "$project" | jq -r '.[0].path')
+  new_dir=$(yazi-pick-dir "$dir")
+  if [[ -d "$new_dir" ]]; then
+    echo -n "Path: $new_dir"
+    read -p "Enter new name(current: '$name'): " new_name
+    new_name="${new_name:-$name}"
+    query "update projects set path = '$new_dir', name = '$new_name' where id = $id"
+  fi
+}
+
+delete-project() {
+  id=$(get-project-id "$1")
+  gum confirm "Are you sure you want to delete this project?" && query "delete from projects where id = $id"
+}
+
+new-project() {
+  dir=$(yazi-pick-dir "$HOME")
+  if [[ -n "$dir" ]]; then
+    echo "$dir"
+    read -p "Enter project name: " name
+    if [[ -n "$name" ]]; then
+      query "insert into projects (name, path) values ('$name', '$dir')"
+    fi
+  fi
+}
+yazi-project() {
+  id=$(get-project-id "$1")
+  dir=$(get-path-project "$1")
+}
+
+ff() {
+  case $1 in
+  p | project)
+    on_enter="execute(open-project {})+clear-query+first+reload(get-all-projects)"
+    if [[ -n "$2" ]]; then
+      on_enter="become($2)"
+    fi
+    fzf \
+      --preview 'preview-project {}' \
+      --bind "start:reload(get-all-projects)" \
+      --bind "ctrl-r:reload(get-all-projects)+clear-query" \
+      --bind "ctrl-space:become($ff_script)" \
+      --bind "ctrl-u:execute(fe)" \
+      --bind "ctrl-e:execute(update-project {})+reload(get-all-projects)" \
+      --bind "alt-n:execute(yazi-project {})+reload(get-all-projects)" \
+      --bind "ctrl-n:execute(new-project)+reload(get-all-projects)" \
+      --bind "ctrl-s:execute(sync-db)" \
+      --bind "del:execute(delete-project {})+reload(get-all-projects)" \
+      --bind "enter:$on_enter" \
+      --bind "esc:clear-query" \
+      --bind "ctrl-c:abort" \
+      --prompt "Projects ❯ " \
+      --reverse --border
+    ;;
+  f | file) ;;
+  s | sync-db)
+    shift 1
+    rm -f "$db_file"
+    sync-db
+    ;;
+  *)
+    ff p
+    ;;
+  esac
+}
+
+export -f ff
+export -f get-all-projects
+export -f query
+export -f yazi-project 
+export -f get-path-project
+export -f open-project
+export -f update-project
+export -f get-project-id
+export -f yazi-pick-dir
+export -f preview-project
+export -f new-project
+export -f sync-db
+export -f delete-project
+
+export SHELL=$(which bash)
+
+ff "$@"

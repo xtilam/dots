@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+layout_name() {
+  echo $([[ -n "$1" ]] && echo "$1" || echo "ze")".kdl"
+
+}
+act() {
+  case "$1" in
+  dump)
+    layout_name=$(layout_name "$2")
+    zellij action dump-layout > $layout_name
+    ;;
+  tab)
+    layout_name=$(layout_name "$2")
+    zellij action new-tab --layout "$layout_name"
+    zellij action go-to-previous-tab
+    zellij action close-tab
+    ;;
+  i)
+    shift 1
+    # zellij run --a
+    ;;
+  *)
+    exit 0
+    ;;
+  esac
+}
+
+[ $# -gt 0 ] && cmd=$1 && shift || cmd=""
+act "$cmd" "$@"

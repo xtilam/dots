@@ -1,0 +1,60 @@
+#!/usr/bin/env sh
+
+act() {
+  cli="zellij ls"
+  case "$1" in
+  run_ngu)
+    echo "reload($cli)+change-header($2)"
+    ;;
+  name)
+    line="$2"
+    name=$(echo "$line" | sed 's/  *\[Created.*//')
+    echo $name
+    ;;
+  attach)
+    zellij attach $(act name "$2")
+    ;;
+  init)
+    default_value=$2
+    printf "\nSession name (default: $default_value): "
+    read -r name
+    name=${name:-$default_value}
+    zellij --session $name
+    ;;
+  kill)
+    name=$(act name "$2")
+    zellij kill-session $name || true
+    ;;
+  delete)
+    name=$(act name "$2")
+    zellij kill-session $name || true
+    zellij delete-session $name || true
+    ;;
+  esc)
+    rs='clear-query'
+    header=""
+    [ -n "$2" ] || header='Press Alt-` to quit'
+    echo "clear-query+change-header($header)"
+    ;;
+  "")
+    reload="reload($cli)"
+    $cli | fzf \
+      --bind "enter:execute($0 attach {})+clear-query" \
+      --bind "ctrl-r:$reload" \
+      --bind "ctrl-c:clear-query" \
+      --bind "delete:execute($0 kill {})+$reload" \
+      --bind "ctrl-delete:execute($0 delete {})+$reload" \
+      --bind 'alt-`:abort' \
+      --bind 'alt-q:abort' \
+      --bind "esc:transform($0 esc {q})" \
+      --bind "ctrl-n:execute($0 init {q})" \
+      --tac --ansi || true
+    ;;
+  *)
+    exit 0
+    ;;
+  esac
+}
+
+[ $# -gt 0 ] && cmd=$1 && shift || cmd=""
+act "$cmd" "$@"

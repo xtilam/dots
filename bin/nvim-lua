@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+args=''
+body=''
+end_args=''
+defer=1
+
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+  --server)
+    shift 1
+    NVIM="$1"
+    ;;
+  --defer)
+    shift 1
+    defer="$1"
+    shift 1
+    ;;
+  --)
+    if [[ -n "$body" ]]; then
+      shift 1
+      break
+    fi
+    has_body='1'
+    shift 1
+    ;;
+  *)
+    body+="$1; "
+    shift 1
+    ;;
+  esac
+done
+
+begin_args=''
+
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+  -s)
+    shift 1
+    args+="$begin_args[[$1]]"
+    shift 1
+    begin_args=', '
+    ;;
+  *)
+    args+="$1"
+    shift 1
+    begin_args=', '
+    ;;
+  esac
+done
+
+# code="vim.defer_fn(function() local v = { $args }; $body end, 0) and nil"
+code="local function act() local v = { $args }; $body end;"
+code+="vim.defer_fn(act, $defer)"
+code="(function() $code; return 0 end)()"
+expr="luaeval($(jq -n --arg body "$code" '$body'))"
+
+if [[ -z "$NVIM" ]]; then
+  echo "NVIM environment variable is not set"
+else
+  echo "NVIM: $NVIM"
+  echo "expr: $expr"
+  nvim --server "$NVIM" --remote-expr "$expr" || echo "
+--[[ code ]] --
+$expr"
+fi

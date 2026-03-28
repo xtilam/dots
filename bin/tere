@@ -1,0 +1,167 @@
+#!/usr/bin/env sh
+timems() {
+  echo $(date +%s%3N)
+}
+
+act() {
+  case "$1" in
+  kitty_yazi)
+    pid=$(niri msg -j focused-window | jq '.pid')
+    # pid=$(hyprctl activewindow -j | jq -r 'select(.class == "kitty") | .pid')
+    if [ -z "$pid" ]; then
+      echo "No kitty window found."
+      exit 1
+    fi
+    listen="unix:/tmp/mykitty-$pid"
+    kitty @ launch --to $listen --type overlay "$0" yazi_task --cwd "$PWD" --kitty 1 "$@"
+    ;;
+  wezterm_yazi)
+    export WEZTERM_UNIX_SOCKET="/tmp/wezterm-desktop"
+    export WEZTERM_PANE=$(wezterm cli list-clients --format=json | jq "map(select(.username == \"$USER\")) | .[0].focused_pane_id")
+    shift 1
+    wezterm cli spawn "$0" "yazi_task" --cwd "$PWD" "--wez-id" $WEZTERM_PANE "$@"
+    ;;
+  ghostty_yazi)
+    shift 1
+    timeout=800
+    cli=$(act jq_args --endtime $(($(timems) + timeout)) --cwd "$PWD" "$@")
+    wl-copy "tere_yazi_task:$cli"
+    wtype -M ctrl -M alt n -m ctrl -m alt
+    wtype -M ctrl -M alt n -m ctrl -m alt
+    ;;
+  jq_args)
+    shift 1
+    echo $(jq -nrc --argjson args "$(printf '%s\n' "$@" | jq -R . | jq -s .)" '$args')
+    ;;
+  time)
+    echo $(timems)
+    ;;
+  handle_task)
+    v=$(wl-paste -n 2>/dev/null)
+    if [ -z "$v" ]; then
+      exit 1
+    fi
+    case "$v" in
+    "tere_yazi_task:"*)
+      data=${v#tere_yazi_task:}
+      wl-copy --clear
+      wtype -M ctrl -M alt n
+      wtype -M ctrl -M alt f
+      eval "$0 yazi_task "$(echo $data | jq -r "@sh") || read
+      exit 0
+      ;;
+    *)
+      exit 1
+      ;;
+    esac
+    ;;
+  print_args)
+    shift 1
+    while [ "$#" -gt 0 ]; do
+      echo "arg: $1"
+      shift 1
+    done
+    ;;
+  yazi)
+    shift 1
+    act_yazi=$TERE_YAZI
+    if [ -n "$1" ]; then
+      act_yazi=ghostty_yazi
+    fi
+    act $TERE_YAZI "$@"
+    ;;
+  yazi_task)
+    act=wl-copy
+    shift 1
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+      -t | --target)
+        shift 1
+        if [ -n "$1" ]; then
+          export "YAZI_TARGET=$1"
+          shift 1
+        fi
+        ;;
+      -c | --cwd)
+        shift 1
+        if [ -n "$1" ]; then
+          export "YAZI_CWD=$1"
+          shift 1
+        fi
+        ;;
+      -e | --env)
+        shift 1
+        if [ -n "$1" ]; then
+          export "$1"
+          shift 1
+        fi
+        ;;
+      -l | --alias)
+        shift 1
+        if [ -n "$1" ]; then
+          alias "$1"
+          shift 1
+        fi
+        ;;
+      -a | --act)
+        shift 1
+        if [ -n "$1" ]; then
+          act="$1"
+          echo $act
+          shift 1
+        fi
+        ;;
+      --wez-id)
+        shift 1
+        if [ -n "$1" ]; then
+          close_act="wezterm cli activate-pane --pane-id $1"
+          shift 1
+        fi
+        ;;
+      --endtime)
+        shift 1
+        if [ -n "$1" ]; then
+          endtime=$1
+          shift 1
+          if [ "$(timems)" -gt "$endtime" ]; then
+            echo "Task expired."
+            exit 1
+          fi
+        fi
+        ;;
+      --kitty)
+        shift 1
+        close_act="kitty @ close-window -m id:$KITTY_WINDOW_ID"
+        ;;
+      --skip-err)
+        shift 1
+        skip_err=1
+        ;;
+      *)
+        echo "skip: $1"
+        shift 1
+        ;;
+      esac
+    done
+    if [ -z "$YAZI_TARGET" ]; then
+      export YAZI_TARGET=$YAZI_CWD
+    fi
+    file=$(yazi --chooser-file=/dev/stdout $YAZI_TARGET || true)
+    if [ -n "$file" ]; then
+      $act "$file" || ([ -n "$skip_err" ] && echo "Failed when executing: $act $file")
+    fi
+    $close_act
+    ;;
+  *)
+    echo "Unknown command: $1"
+    exit 1
+    ;;
+  esac
+}
+
+# command='file=$(YAZI_CWD="$PWD" YAZI__target="$1" yazi --chooser-file=/dev/stdout $1);
+# [ -n "$file" ] && ($2 $file || bash);
+# kitty @ close-window -m id:$KITTY_WINDOW_ID'
+
+[ $# -gt 0 ] && cmd=$1 && shift || cmd=""
+act "$cmd" "$@"
