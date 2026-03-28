@@ -77,10 +77,7 @@ binds {
 		show-hotkey-overlay
 	}
 	Mod+T hotkey-overlay-title="Open a Terminal" {
-		spawn "kitty"
-	}
-	Mod+n hotkey-overlay-title="Open a Terminal" {
-		spawn "ff"
+		spawn "ghostty"
 	}
 	Mod+Space hotkey-overlay-title="Run an Application: fuzzel" {
 		spawn "fuzzel"

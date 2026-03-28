@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 timems() {
   echo $(date +%s%3N)
 }
@@ -24,8 +24,19 @@ act() {
   ghostty_yazi)
     shift 1
     timeout=800
-    cli=$(act jq_args --endtime $(($(timems) + timeout)) --cwd "$PWD" "$@")
-    wl-copy "tere_yazi_task:$cli"
+    endtime=$(($(timems) + timeout))
+    target="$HOME/.tere_task"
+    {
+      echo '>'$target
+      echo 'wtype -M ctrl -M alt n -m ctrl -m alt'
+      echo 'wtype -M ctrl -M alt f -m ctrl -m alt'
+      echo -n tere yazi_task --cwd $PWD --endtime $endtime
+      if [[ "$#" -gt 0 ]]; then
+        printf " %q" "$@"
+      fi
+      printf "\nexit"
+    } \
+      >"$target"
     wtype -M ctrl -M alt n -m ctrl -m alt
     wtype -M ctrl -M alt n -m ctrl -m alt
     ;;
@@ -35,25 +46,6 @@ act() {
     ;;
   time)
     echo $(timems)
-    ;;
-  handle_task)
-    v=$(wl-paste -n 2>/dev/null)
-    if [ -z "$v" ]; then
-      exit 1
-    fi
-    case "$v" in
-    "tere_yazi_task:"*)
-      data=${v#tere_yazi_task:}
-      wl-copy --clear
-      wtype -M ctrl -M alt n
-      wtype -M ctrl -M alt f
-      eval "$0 yazi_task "$(echo $data | jq -r "@sh") || read
-      exit 0
-      ;;
-    *)
-      exit 1
-      ;;
-    esac
     ;;
   print_args)
     shift 1
@@ -110,6 +102,11 @@ act() {
           echo $act
           shift 1
         fi
+        ;;
+      --ghostty)
+        shift 1
+        wtype -M ctrl -M alt n
+        wtype -M ctrl -M alt f
         ;;
       --wez-id)
         shift 1
