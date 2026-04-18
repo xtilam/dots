@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+echo "Running copilot-task..."
+
+act='New Session
+Resume'
+
+act=$(echo "$act" | fzf)
+
+case $act in
+"New Session")
+  copilot
+  ;;
+"Resume")
+  copilot --resume
+  ;;
+esac

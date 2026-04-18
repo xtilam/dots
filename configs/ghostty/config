@@ -6,10 +6,11 @@ background-opacity=0.9
 keybind = ctrl+t=unbind
 window-decoration = false
 keybind = ctrl+alt+shift+t=new_tab
-# window-show-tab-bar = never
+window-show-tab-bar = never
 
 keybind = ctrl+alt+n>ctrl+alt+n=new_split:left
 keybind = ctrl+alt+n>ctrl+alt+f=toggle_split_zoom
+keybind = ctrl+alt+n>ctrl+alt+t=new_tab
 keybind = ctrl+alt+l=toggle_tab_overview
 
 custom-shader-animation = always

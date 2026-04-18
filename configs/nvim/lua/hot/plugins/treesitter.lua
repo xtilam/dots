@@ -2,7 +2,6 @@ local m = hot.add(...)
 
 local ensure_installed = {
 	"bash",
-	"sh",
 	"c",
 	"diff",
 	"html",
@@ -28,7 +27,7 @@ local ensure_installed = {
 	"css",
 }
 
-m.auto_cmd("FileType", {
+m:auto_cmd("FileType", {
 	pattern = ensure_installed,
 	callback = function()
 		pcall(vim.treesitter.start)

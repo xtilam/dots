@@ -38,4 +38,5 @@ return {
 	require("hot.plugins.which-key"),
 	require("hot.plugins.lualine"),
 	require("hot.plugins.indent-blank"),
+  -- require("hot.plugins.emmet-vim"),
 }

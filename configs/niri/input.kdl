@@ -4,7 +4,7 @@ input {
 
 		}
 		repeat-delay 200
-		// repeat-rate 40
+		repeat-rate 40
 		numlock
 	}
 	touchpad {

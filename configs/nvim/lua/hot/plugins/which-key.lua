@@ -1,3 +1,19 @@
+local m = hot.add(...)
+
+local function add_which_key()
+	local wk = require("which-key")
+	wk.add({
+		{ "t", mode = "n", desc = "Custom" },
+		{ "<leader>f", desc = "Telescope" },
+		{ "<leader>b", desc = "Buffer" },
+		{ "<leader>c", desc = "File, Code" },
+		{ "<leader>n", desc = "Notification" },
+		{ "<leader>a", desc = "AI" },
+	})
+end
+
+m:on_reload(add_which_key)
+
 return {
 	"folke/which-key.nvim",
 	event = "VeryLazy",
@@ -7,7 +23,7 @@ return {
 		wk.setup({
 			preset = "helix",
 			spec = {},
-			delay = 0, -- Nhấn t là hiện menu luôn, đéo chờ đợi gì hết
+			delay = 0,
 			icons = {
 				breadcrumb = "»",
 				separator = "➜",
@@ -18,17 +34,6 @@ return {
 				{ "t", mode = { "n" } },
 			},
 		})
+		add_which_key()
 	end,
-
-	-- keys = {
-	-- 	"<leader>",
-	-- 	"<c-w>",
-	-- 	'"',
-	-- 	"'",
-	-- 	"`",
-	-- 	"c",
-	-- 	"v",
-	-- 	"g",
-	-- 	"t",
-	-- },
 }

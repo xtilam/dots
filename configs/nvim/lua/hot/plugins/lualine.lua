@@ -1,4 +1,43 @@
-local item = require("hot.lualine.default")
+local state = require("hot.state")
+local m = hot.add(...)
+
+local show_macro = {
+	m:fn("show_macro", function()
+		local recording_register = vim.fn.reg_recording()
+		if recording_register == "" then
+			return ""
+		else
+			return "󰑋  Recording @" .. recording_register
+		end
+	end),
+}
+
+local copilot = {
+	m:fn("copilot", function()
+		local status = require("copilot.api").status.data.status
+		local icon = ""
+		if status == "InProgress" then
+			icon = "?"
+		elseif status == "Warning" then
+			icon = ""
+		end
+		return icon .. " "
+	end),
+	cond = function()
+		return state.is_copilot_running()
+	end,
+	color = m:fn("copilot_color", function()
+		return { fg = "#6cc644" }
+	end),
+}
+local custom_mode = {
+	m:fn("hydra", function()
+		return state.hydra_mode or ""
+	end),
+	color = m:fn("hydra_color", function()
+		return { fg = "#ff0000", bold = true }
+	end),
+}
 
 return {
 	"nvim-lualine/lualine.nvim",
@@ -42,9 +81,9 @@ return {
 				lualine_b = { "branch", "diff", "diagnostics" },
 				lualine_c = { "filename" },
 				lualine_x = {
-					item.custom_mode,
-					item.copilot,
-					item.show_macro,
+					custom_mode,
+					copilot,
+					show_macro,
 					"fileformat",
 					"filetype",
 				},

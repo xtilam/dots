@@ -3,7 +3,7 @@
 args=''
 body=''
 end_args=''
-defer=1
+defer=10
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in

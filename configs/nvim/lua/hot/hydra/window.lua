@@ -1,5 +1,5 @@
-local cache = hot.add(...).cache
-local m = cache.get("m", {})
+local m = hot.add(...)
+local e = m.exports 
 
 local hydra = require("hydra")
 local lualine = require("lualine")
@@ -7,7 +7,7 @@ local state = require("hot.state")
 
 vim.api.nvim_set_hl(0, "HydraCursor", { fg = "#ffffff", bg = "#ff0000" })
 
-m.win = hydra({
+e.win = hydra({
 	name = "Window",
 	mode = "n",
 	body = "<leader>whi",
@@ -16,7 +16,7 @@ m.win = hydra({
 		on_key = function()
 			lualine.refresh({ force = true })
 		end,
-		on_exit = cache.fn("w_exit", function()
+		on_exit = m:fn("w_exit", function()
 			state.hydra_mode = ""
 			vim.api.nvim_set_hl(0, "Cursor", { bg = "#ffffff" })
 			vim.opt.guicursor = vim.opt.guicursor:remove("n:HydraCursor")
@@ -41,11 +41,11 @@ m.win = hydra({
 	},
 })
 
-m.start = cache.fn("start", function()
+e.start = m:fn("start", function()
 	state.hydra_mode = "Window"
 	lualine.refresh({ force = true })
 	vim.opt.guicursor = vim.opt.guicursor:append("n:HydraCursor")
-	m.win:activate()
+	e.win:activate()
 end)
 
 -- vim.opt.termguicolors = true
@@ -53,4 +53,4 @@ end)
 -- vim.opt.guicursor = "n:block-Cursor"
 -- vim.opt.guicursor.append("n:FakeBlock")
 
-return m
+return e

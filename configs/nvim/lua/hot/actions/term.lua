@@ -1,74 +1,133 @@
-local cache = hot.add(...).cache
-local M = cache.get("m", {})
-local fterm = require("FTerm")
-local is_dev = 1
+local m = hot.add(...)
+local e = m.exports
 
-local copilot = cache.get("copilot", function()
-	local term = fterm:new({
-		ft = "copilot",
-		cmd = "copilot",
-		dimensions = {
-			height = 0.5,
-			width = 0.5,
-		},
-	})
+local constants = require("hot.constants")
+local Term = require("hot.float-term").Term
+local setup = {}
 
-	term.state = { posx = "center", posy = "center" }
-	return term
-end)
+local ze = nil
 
-function M.copilot()
-	copilot.config.dimensions.x = 0
-	copilot:open()
-	if copilot.buf ~= copilot.hk_buf or is_dev then
-		copilot.hk_buf = copilot.buf
-		vim.keymap.set("t", "<C-t>", function()
-			copilot:close()
-		end, { buffer = copilot.buf, desc = "Close Copilot" })
-
-		vim.keymap.set("t", "<M-h>", function()
-			copilot.state.posx = "left"
-			copilot:update_state()
-			copilot:resize()
-		end, { buffer = copilot.buf, desc = "Resize Copilot" })
-
-		vim.keymap.set("t", "<M-l>", function()
-			copilot.state.posx = "right"
-			copilot:update_state()
-			copilot:resize()
-		end, { buffer = copilot.buf, desc = "Resize Copilot" })
-
-		vim.keymap.set("t", "<M-i>", function()
-			copilot.state.posx = "center"
-			copilot:update_state()
-			copilot:resize()
-		end, { buffer = copilot.buf, desc = "Resize Copilot" })
+function e.open(path, reset)
+	local is_dir = vim.fn.isdirectory(path) == 1
+	if is_dir then
+		dd("Opening directory: " .. path)
+		vim.cmd("cd " .. path)
+		if reset ~= false and ze then
+			ze:close_buf()
+		end
+	else
+		vim.cmd("edit " .. path)
 	end
 end
 
-pcall(function()
-	local U = require("FTerm.utils")
-	local A = vim.api
-	local fn = vim.fn
-	local cmd = A.nvim_command
-	local pos_inc = { 0, 0.5, 1 }
-	local size_inc = { 0.25, 0.5, 0.75, 1 }
+function setup.copilot(hk)
+	local t = Term:init({
+		ft = "copilot",
+		cmd = "bash " .. constants.bin_file("copilot-task"),
+		dimensions = {
+			width = 0.5,
+			height = 1,
+			x = 1,
+			y = 0.5,
+		},
+	})
+	t:hk_global(hk, {
+		{ "toggle", t.close },
+		{ "<M-l>", t:get_change_demensions_callback({ x = 1 }) },
+		{ "<M-h>", t:get_change_demensions_callback({ x = -1 }) },
+		{ "<M-->", t:get_change_demensions_callback({ width = 1 }) },
+		{ "<M-=>", t:get_change_demensions_callback({ width = -1 }) },
+	})
+	m:on_clean(t:get_clean_callback())
+end
 
-	local Term = require("FTerm.terminal")
-	function Term:resize()
-		self:close()
-		self:open()
-		-- local cfg = self.config
-		-- local dim = U.get_dimension(cfg.dimensions)
-		-- vim.api.nvim_win_set_config(self.buf, {
-		-- 	border = cfg.border,
-		-- 	relative = "editor",
-		-- 	style = "minimal",
-		-- 	width = dim.width,
-		-- 	height = dim.height,
-		-- 	col = dim.col,
-		-- 	row = dim.row,
-		-- })
+function setup.zellij(hk)
+	ze = Term:init({
+		cmd = ([[export PROJECT_DIR="$PWD"; (zellij attach {name} ||  zellij -s {name}) && zellij delete-session {name} || true ]]):fm({
+			name = [[${PWD//\//\\}]],
+		}),
+		border = "none",
+		auto_close = true,
+		dimensions = {
+			height = 2,
+			width = 1,
+		},
+	})
+	ze:hk_global(hk, {
+		{ "toggle", ze.close },
+	})
+	m:on_clean(ze:get_clean_callback())
+end
+
+function setup.projects(hk)
+	local t = Term:init({
+		cmd = [[dir=$(ff --cd) && nvim-lua --defer 10 -- "require('hot.actions.term').open('$dir', 1)" || true]],
+		auto_close = true,
+		border = "none",
+		dimensions = {
+			height = 2,
+			width = 0.7,
+			x = 1,
+		},
+	})
+	t:hk_global(hk, {
+		{ "toggle", t.close },
+	})
+	m:on_clean(t:get_clean_callback())
+end
+
+e.setup = function(hk)
+	for name, hk in pairs(hk) do
+		local fn = setup[name]
+		if fn then
+			fn(hk)
+		end
 	end
-end)
-return M
+end
+
+return e
+
+-- function e.copilot()
+-- 	copilot:open()
+-- 	if copilot.buf ~= copilot.hk_buf or is_dev then
+-- 		copilot.hk_buf = copilot.buf
+-- 		-- vim.keymap.set("t", "<M-t>", function()
+-- 		-- 	copilot:close()
+-- 		-- end, { buffer = copilot.buf, desc = "Close Copilot" })
+--
+-- 	-- 	vim.keymap.set("t", "<M-l>", function()
+-- 	-- 		copilot:update_dimensions("x", 1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	--
+-- 	-- 	vim.keymap.set("t", "<M-h>", function()
+-- 	-- 		copilot:update_dimensions("x", -1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	--
+-- 	-- 	vim.keymap.set("t", "<M-j>", function()
+-- 	-- 		copilot:update_dimensions("height", 1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	--
+-- 	-- 	vim.keymap.set("t", "<M-k>", function()
+-- 	-- 		copilot:update_dimensions("height", -1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	--
+-- 	-- 	vim.keymap.set("t", "<M-->", function()
+-- 	-- 		copilot:update_dimensions("width", -1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	--
+-- 	-- 	vim.keymap.set("t", "<M-=>", function()
+-- 	-- 		copilot:update_dimensions("width", 1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	--
+-- 	-- 	vim.keymap.set("t", "<M-=>", function()
+-- 	-- 		copilot:update_dimensions("width", 1)
+-- 	-- 		copilot:apply_dimensions()
+-- 	-- 	end, { buffer = copilot.buf })
+-- 	-- end
+-- end

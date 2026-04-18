@@ -1,18 +1,15 @@
 #!/usr/bin/env sh
 
-act() {
+fe() {
   cli="zellij ls"
   case "$1" in
-  run_ngu)
-    echo "reload($cli)+change-header($2)"
-    ;;
   name)
     line="$2"
     name=$(echo "$line" | sed 's/  *\[Created.*//')
     echo $name
     ;;
   attach)
-    zellij attach $(act name "$2")
+    zellij attach $(fe name "$2")
     ;;
   init)
     default_value=$2
@@ -22,11 +19,11 @@ act() {
     zellij --session $name
     ;;
   kill)
-    name=$(act name "$2")
+    name=$(fe name "$2")
     zellij kill-session $name || true
     ;;
   delete)
-    name=$(act name "$2")
+    name=$(fe name "$2")
     zellij kill-session $name || true
     zellij delete-session $name || true
     ;;
@@ -57,4 +54,4 @@ act() {
 }
 
 [ $# -gt 0 ] && cmd=$1 && shift || cmd=""
-act "$cmd" "$@"
+fe "$cmd" "$@"

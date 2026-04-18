@@ -25,5 +25,5 @@ local tokyo = {
 	end,
 }
 
-m.on_reload(tokyo.config)
+m:on_reload(tokyo.config)
 return tokyo

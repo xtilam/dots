@@ -29,7 +29,7 @@ local cfg = {
 	},
 }
 
-m.on_reload(function()
+m:on_reload(function()
 	local conform = require("conform")
 	conform.formatters_by_ft = cfg.formatters_by_ft
 	conform.formatters = cfg.formatters

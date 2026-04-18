@@ -245,14 +245,14 @@ binds {
 	Mod+Page_Up {
 		focus-workspace-up
 	}
-	Mod+U {
+	Mod+I {
       spawn-sh r#"
 niri msg action focus-column-right
 niri msg action focus-window-up
 niri msg action focus-column-left
 "#
 	}
-	Mod+I {
+	Mod+U {
       spawn-sh r#"
 niri msg action focus-column-right
 niri msg action focus-window-down

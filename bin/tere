@@ -28,8 +28,8 @@ act() {
     target="$HOME/.tere_task"
     {
       echo '>'$target
-      echo 'wtype -M ctrl -M alt n -m ctrl -m alt'
-      echo 'wtype -M ctrl -M alt f -m ctrl -m alt'
+      # echo 'wtype -M ctrl -M alt n -m ctrl -m alt'
+      # echo 'wtype -M ctrl -M alt f -m ctrl -m alt'
       echo -n tere yazi_task --cwd $PWD --endtime $endtime
       if [[ "$#" -gt 0 ]]; then
         printf " %q" "$@"
@@ -37,8 +37,10 @@ act() {
       printf "\nexit"
     } \
       >"$target"
+    # wtype -M ctrl -M alt n -m ctrl -m alt
+
     wtype -M ctrl -M alt n -m ctrl -m alt
-    wtype -M ctrl -M alt n -m ctrl -m alt
+    wtype -M ctrl -M alt t -m ctrl -m alt
     ;;
   jq_args)
     shift 1

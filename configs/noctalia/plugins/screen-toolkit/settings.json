@@ -1,18 +1,30 @@
 {
   "stateIsRunning": false,
-  "stateActiveTool": "",
+  "stateActiveTool": "colorpicker",
   "transAvailable": true,
   "stateMirrorVisible": false,
-  "resultHex": "",
-  "resultRgb": "",
-  "resultHsv": "",
-  "resultHsl": "",
-  "colorCapturePath": "",
+  "resultHex": "#9E88FF",
+  "resultRgb": "rgb(158, 136, 255)",
+  "resultHsv": "hsv(251, 47%, 100%)",
+  "resultHsl": "hsl(251, 100%, 77%)",
+  "colorCapturePath": "/tmp/screen-toolkit-colorpicker.png",
   "paletteColors": [
-    "#EDEDED",
-    "#FFFFFF"
+    "#62605D",
+    "#A3A498",
+    "#C4BB9A",
+    "#D1CDA9",
+    "#F5F6BB",
+    "#E1E3D0",
+    "#FFFFFD",
+    "#FEFEFC"
   ],
   "colorHistory": [
+    "#9E88FF",
+    "#F0F8FF",
+    "#F7F7F7",
+    "#199CDB",
+    "#F0F0F0",
+    "#F5F5F5",
     "#0D2452",
     "#409BE6"
   ],
@@ -144,5 +156,8 @@
     "vie",
     "yid",
     "yor"
-  ]
+  ],
+  "detectedRecorder": "wf-recorder",
+  "detectedCompositor": "niri",
+  "colorCacheBust": 1776450101927
 }

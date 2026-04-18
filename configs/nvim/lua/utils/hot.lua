@@ -4,6 +4,18 @@ local auto_reload_modules = {}
 local stack_loaded = {}
 
 _G.hot = M
+_G.hot.debugger = false
+
+local function try_call(func, ...)
+	local isOk, rs = pcall(func, ...)
+	if not isOk then
+		if _G.hot.debugger then
+			dd("Error calling function:", rs)
+		end
+		return nil
+	end
+	return rs
+end
 
 local function try_load(module_name)
 	local success, result = pcall(require, module_name)
@@ -36,80 +48,120 @@ function reset(module_name)
 	stack_loaded = {}
 end
 
-local function init_module()
-	local module = {}
-	local cache = {}
-	local fn = {}
-	local auto_cmds = {}
+local Cache = {}
+Cache.__index = Cache
+local Module = {}
+Module.__index = Module
 
-	module.cache = cache
+function Cache:new()
+	return setmetatable({}, Cache)
+end
 
-	cache.get = function(key, default_value)
-		if cache[key] == nil then
-			if type(default_value) == "function" then
-				cache[key] = default_value()
-			else
-				cache[key] = default_value
+function Cache:get(key, default_value, ...)
+	local entry = self[key]
+	local should_update = false
+	local deps = { ... }
+
+	if entry == nil then
+		should_update = true
+	else
+		local entry_deps = entry[2]
+		if #entry_deps ~= #deps then
+			should_update = true
+		else
+			for i = 1, #deps do
+				if entry_deps[i] ~= deps[i] then
+					should_update = true
+					break
+				end
 			end
 		end
-		return cache[key]
-	end
-	cache.fn = function(name, callback)
-		local fn_idx = cache.get("_fn_idx_" .. name, #fn + 1)
-		fn[fn_idx] = callback
-		return function(...)
-			return fn[fn_idx](...)
-		end
-	end
-	module.on_reload = function(callback, fallback_on_hot)
-		if module.hot then
-			callback()
-		elseif fallback_on_hot then
-			fallback_on_hot()
-		end
-	end
-	module.clear_auto_cmds = function()
-		for _, id in ipairs(auto_cmds) do
-			vim.api.nvim_del_autocmd(id)
-		end
-		auto_cmds = {}
-	end
-	module.lazy = function(callback)
-		if not module.hot then
-			vim.api.nvim_create_autocmd("User", {
-				pattern = "LazyDone",
-				callback = callback,
-			})
-		else
-			callback()
-		end
-		return module
 	end
 
-	function module.auto_cmd(...)
-		local args = { ... }
-		local ok, id = pcall(vim.api.nvim_create_autocmd, unpack(args))
-		if ok then
-			table.insert(auto_cmds, id)
-			return id
+	if should_update then
+		local value
+		if type(default_value) == "function" then
+			value = default_value()
 		else
-			dd("Error creating autocmd:", args, id)
+			value = default_value
 		end
+		self[key] = { value, { ... } }
+		return value
 	end
-	module.get = function()
-		return module.cache, module.hot
+
+	return entry[1]
+end
+
+function Cache:reset(key, ...)
+  self[key] = nil
+  return self:get(key, ...)
+end
+
+function Cache:fn(name, callback, ...)
+	return self:get("_fn_" .. name, function()
+		return callback
+	end, ...)
+end
+
+function Module:new()
+	return setmetatable({
+		cache = Cache:new(),
+		exports = {},
+		reloaded = 0,
+		_cleanup = {},
+		_auto_cmds = {},
+	}, Module)
+end
+
+function Module:on_reload(callback)
+	if self.reloaded > 0 then
+		try_call(callback)
 	end
-	return module
+end
+
+function Module:on_clean(callback)
+	table.insert(self._cleanup, callback)
+end
+
+function Module:auto_cmd(...)
+	local args = { ... }
+	local id = try_call(vim.api.nvim_create_autocmd, unpack(args))
+	if id ~= nil then
+		table.insert(self._auto_cmds, id)
+	end
+end
+
+function Module:run_cleanup()
+	for i = 1, #self._cleanup do
+		try_call(self._cleanup[i])
+	end
+
+	for i = 1, #self._auto_cmds do
+		try_call(vim.api.nvim_del_autocmd, self._auto_cmds[i])
+	end
+	self._cleanup = {}
+end
+
+function Module:fn(...)
+	return self.cache:fn(...)
+end
+
+function Module:get(...)
+	return self.cache:get(...)
+end
+
+function Module:reset(...)
+	return self.cache:reset(...)
 end
 
 function M.add(module, is_auto_reload)
 	local data = modules_data[module]
 	if data == nil then
-		data = init_module()
+		data = Module:new()
 		modules_data[module] = data
 	else
-		data.hot = true
-		data.clear_auto_cmds()
+		data.reloaded = data.reloaded + 1
+		data:run_cleanup()
 	end
 
 	if is_auto_reload then

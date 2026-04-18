@@ -1,7 +1,7 @@
 {
   "id": "screen-toolkit",
   "name": "Screen Toolkit",
-  "version": "1.0.3",
+  "version": "1.1.1",
   "minNoctaliaVersion": "4.5.0",
   "author": "ycf-anon",
   "license": "MIT",
@@ -17,7 +17,8 @@
     "main": "Main.qml",
     "barWidget": "BarWidget.qml",
     "controlCenterWidget": "ControlCenterWidget.qml",
-    "panel": "Panel.qml"
+    "panel": "Panel.qml",
+    "settings": "Settings.qml"
   },
   "dependencies": {
     "plugins": []
@@ -26,9 +27,16 @@
     "defaultSettings": {
       "colorHistory": [],
       "paletteColors": [],
-      "installedLangs": ["eng"],
+      "installedLangs": [
+        "eng"
+      ],
       "transAvailable": false,
-      "selectedOcrLang": "eng"
+      "selectedOcrLang": "eng",
+      "screenshotPath": "",
+      "videoPath": "",
+      "filenameFormat": "",
+      "detectedRecorder": "",
+      "detectedCompositor": ""
     }
   }
 }

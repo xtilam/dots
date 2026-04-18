@@ -11,6 +11,7 @@ function setup()
 	add("tsls")
 	add("jsonls")
 	add("rust")
+	add("emmet")
 
 	vim.lsp.enable({ "html", "cssls" })
 	vim.lsp.enable({ "bashls" })
