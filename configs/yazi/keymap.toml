@@ -94,7 +94,8 @@ keymap = [
 
 	# Copy
 	{ on = [ "c", "c" ], run = "copy path",             desc = "Copy the file path" },
-	{ on = [ "c", "d" ], run = "copy dirname",          desc = "Copy the directory path" },
+	{ on = [ "c", "d" ], run = "cd --interactive",          desc = "Copy the directory path" },
+	{ on = [ "c", "r" ], run = "copy dirname",          desc = "Copy the directory path" },
 	{ on = [ "c", "f" ], run = "copy filename",         desc = "Copy the filename" },
 	{ on = [ "c", "n" ], run = "copy name_without_ext", desc = "Copy the filename without extension" },
 
@@ -155,6 +156,9 @@ keymap = [
 	# Help
 	{ on = "~",    run = "help", desc = "Open help" },
 	{ on = "<F1>", run = "help", desc = "Open help" },
+
+  #Others
+	{ on = [ "<A-p>" ], run = "shell --block 'ya emit cd $(ff --cd)'", desc = "Go to project" },
 ]
 
 [tasks]

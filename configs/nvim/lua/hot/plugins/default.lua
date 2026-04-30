@@ -1,4 +1,4 @@
-return {
+local plugins = table.filter_no({
 	{
 		"akinsho/bufferline.nvim",
 		version = "*",
@@ -13,8 +13,8 @@ return {
 		},
 	},
 	{ "neovim/nvim-lspconfig", config = require("hot.lspconfig") },
-	{ "nvimtools/hydra.nvim" },
-	{
+	cc.no({ "nvimtools/hydra.nvim" }),
+	cc._o({
 		"numToStr/FTerm.nvim",
 		config = function()
 			require("FTerm").setup({
@@ -25,18 +25,21 @@ return {
 				},
 			})
 		end,
-	},
+	}),
 	require("hot.plugins.conform"),
 	require("hot.plugins.flash_nvim"),
 	require("hot.plugins.telescope"),
 	require("hot.plugins.treesitter"),
-	require("hot.plugins.noice"),
-	require("hot.plugins.cmp"),
-	require("hot.plugins.copilot"),
+	cc.require("hot.plugins.noice"),
+	cc.require("hot.plugins.copilot"),
+	cc.require("hot.plugins.cmp"),
 	require("hot.plugins.markmap"),
 	require("hot.plugins.themes"),
 	require("hot.plugins.which-key"),
-	require("hot.plugins.lualine"),
+	cc.require("hot.plugins.lualine"),
 	require("hot.plugins.indent-blank"),
-  -- require("hot.plugins.emmet-vim"),
-}
+	require("hot.plugins.nvim-ts-autotag"),
+	-- require("hot.plugins.emmet-vim"),
+}, nil)
+
+return plugins

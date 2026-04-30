@@ -14,7 +14,10 @@ vim.g.copilot_no_tab_map = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.wrap = false
-vim.opt.showcmdloc = "statusline" 
+vim.opt.showcmdloc = "statusline"
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.writebackup = false
+vim.opt.undofile = true
 
 -- require("themes.dracula").setup()
-

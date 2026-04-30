@@ -112,6 +112,7 @@ ff() {
   on_enter="execute(__ff_action open-project {})+clear-query+first+reload(__ff_action get-all-projects)"
   act=project
   binds=""
+  prompt_p="Projects"
 
   case $1 in
   p | project)
@@ -128,6 +129,7 @@ ff() {
     ;;
   --cd)
     on_enter="become(__ff_action get-path-project {})"
+    prompt_p="Dirrectory"
     shift 1
       ;;
   *)
@@ -151,7 +153,8 @@ ff() {
       --bind "enter:$on_enter" \
       --bind "esc:clear-query" \
       --bind "ctrl-c:abort" \
-      --prompt "Projects ❯ " \
+      --bind "alt-p:abort" \
+      --prompt "$prompt_p ❯ " \
       --reverse --border
     ;;
   esac

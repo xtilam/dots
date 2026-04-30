@@ -6,7 +6,7 @@ background-opacity=0.9
 keybind = ctrl+t=unbind
 window-decoration = false
 keybind = ctrl+alt+shift+t=new_tab
-window-show-tab-bar = never
+# window-show-tab-bar = never
 
 keybind = ctrl+alt+n>ctrl+alt+n=new_split:left
 keybind = ctrl+alt+n>ctrl+alt+f=toggle_split_zoom

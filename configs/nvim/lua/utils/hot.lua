@@ -27,7 +27,7 @@ local function try_load(module_name)
 	return result
 end
 
-function reset(module_name)
+local function reset(module_name)
 	if modules_data[module_name] == nil then
 		return
 	end
@@ -47,7 +47,7 @@ function reset(module_name)
 
 	stack_loaded = {}
 end
-
+_G.hot.reset = reset
 local Cache = {}
 Cache.__index = Cache
 local Module = {}
@@ -93,8 +93,8 @@ function Cache:get(key, default_value, ...)
 end
 
 function Cache:reset(key, ...)
-  self[key] = nil
-  return self:get(key, ...)
+	self[key] = nil
+	return self:get(key, ...)
 end
 
 function Cache:fn(name, callback, ...)
@@ -179,8 +179,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 		local module_name = path:match("lua/(.-)%.lua$")
 		if module_name then
 			module_name = module_name:gsub("/", ".")
-			package.loaded[module_name] = nil
-			reset(module_name)
+      reset(module_name)
 		end
 	end,
 })

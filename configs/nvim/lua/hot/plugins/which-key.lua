@@ -21,7 +21,7 @@ return {
 	config = function(_, opts)
 		local wk = require("which-key")
 		wk.setup({
-			preset = "helix",
+			preset = cc.no("helix"),
 			spec = {},
 			delay = 0,
 			icons = {

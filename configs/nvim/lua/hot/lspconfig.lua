@@ -11,10 +11,11 @@ function setup()
 	add("tsls")
 	add("jsonls")
 	add("rust")
-	add("emmet")
+	add("tailwindcss")
 
 	vim.lsp.enable({ "html", "cssls" })
 	vim.lsp.enable({ "bashls" })
+
 end
 
 return setup

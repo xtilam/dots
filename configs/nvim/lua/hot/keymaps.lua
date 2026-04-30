@@ -14,11 +14,23 @@ m:on_reload(function()
 	end
 end)
 
+local code_action = function(ctx)
+	vim.lsp.buf.code_action(ctx)
+end
+
 km:clear()
 
 km:del("", "<C-s>")
 km:del("", "<C-w>")
-km:set({ "n" }, "tt", vim.lsp.buf.rename, { desc = "Rename Lsp" })
+km:set({ "n" }, "tt", function()
+	vim.lsp.buf.rename()
+end, { desc = "Rename Lsp" })
+
+km:set({ "n" }, "tj", bind(code_action, nil), { desc = "Code Action" })
+km:set({ "v" }, "v", "V", { desc = "Visual line" })
+
+km:set({ "n" }, "tk", bind(code_action, { context = { only = { "source" } } }), { desc = "Source Action" })
+km:set({ "n" }, "tn", "gra", { desc = "Source action" })
 km:set({ "n", "v", "i" }, "<C-s>", require("hot.actions.write_file"), { desc = "Write file" })
 km:set({ "n" }, "<leader>ww", require("hot.actions.write_file"), { desc = "Write file" })
 km:set({ "n" }, "<leader>ww", require("hot.actions.write_file"), { desc = "Write file" })
@@ -26,6 +38,8 @@ km:set("n", "<M-q>", "<cmd>qa!<CR>", { desc = "Close nvim" })
 km:set("n", "<S-h>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Previous buffer" })
 km:set("n", "<S-l>", "<cmd>BufferLineCycleNext<CR>", { desc = "Next buffer" })
 km:set("t", "<M-q>", "<cmd>bd!<CR>", { desc = "Terminal normal mode" })
+
+km:set("n", "<leader>fd", "<cmd>Telescope diagnostics<CR>", { desc = "Show diagnostics" })
 km:set("n", "<leader>fw", "<cmd>Telescope live_grep<CR>", { desc = "Find word" })
 km:set("n", "<leader>fh", "<cmd>Telescope command_history<CR>", { desc = "Command History" })
 km:set("n", "<leader>ff", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { desc = "Find in buffer" })
@@ -45,7 +59,9 @@ km:set("n", "<leader>cd", _fn("(f)copy(f())", vim.fn.getcwd), { desc = "Copy CWD
 km:set({ "n", "i", "v" }, "<M-n>", bind(act.tere, "yazi"), { desc = "Tere yazi" })
 km:set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 km:set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
-km:set("n", "tw", require("hot.hydra.window").start, { desc = "Window Mode" })
+if cc.n then
+	km:set("n", "tw", require("hot.hydra.window").start, { desc = "Window Mode" })
+end
 km:set("n", "tv", "gvo<Esc>", { desc = "Go to end last visual" })
 km:set("v", "u", function() end, { desc = "Override lowercase" })
 

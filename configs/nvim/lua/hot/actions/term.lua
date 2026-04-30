@@ -35,8 +35,8 @@ function setup.copilot(hk)
 		{ "toggle", t.close },
 		{ "<M-l>", t:get_change_demensions_callback({ x = 1 }) },
 		{ "<M-h>", t:get_change_demensions_callback({ x = -1 }) },
-		{ "<M-->", t:get_change_demensions_callback({ width = 1 }) },
-		{ "<M-=>", t:get_change_demensions_callback({ width = -1 }) },
+		{ "<M-->", t:get_change_demensions_callback({ width = -1 }) },
+		{ "<M-=>", t:get_change_demensions_callback({ width = 1 }) },
 	})
 	m:on_clean(t:get_clean_callback())
 end
@@ -44,17 +44,22 @@ end
 function setup.zellij(hk)
 	ze = Term:init({
 		cmd = ([[export PROJECT_DIR="$PWD"; (zellij attach {name} ||  zellij -s {name}) && zellij delete-session {name} || true ]]):fm({
-			name = [[${PWD//\//\\}]],
+			name = [[${PWD//\//_}]],
 		}),
 		border = "none",
 		auto_close = true,
 		dimensions = {
 			height = 2,
 			width = 1,
+      x = 1,
 		},
 	})
 	ze:hk_global(hk, {
 		{ "toggle", ze.close },
+		{ "<M-S-L>", ze:get_change_demensions_callback({ x = 1 }) },
+		{ "<M-S-H>",ze:get_change_demensions_callback({ x = -1 }) },
+		{ "<M-->", ze:get_change_demensions_callback({ width = -1 }) },
+		{ "<M-=>", ze:get_change_demensions_callback({ width = 1 }) },
 	})
 	m:on_clean(ze:get_clean_callback())
 end
@@ -83,6 +88,10 @@ e.setup = function(hk)
 			fn(hk)
 		end
 	end
+end
+
+e.ze = function()
+	return ze
 end
 
 return e

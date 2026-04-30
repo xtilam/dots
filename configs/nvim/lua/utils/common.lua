@@ -1,4 +1,30 @@
 require("utils.string")
+require("utils.table")
+
+_G.cc = (function()
+	local is_nvim = not vim.g.vscode
+	local rs = {}
+	rs._o = function(v)
+		return v
+	end
+	rs._equire = require
+	if is_nvim then
+		rs.n = true
+		rs.c = false
+		rs.no = rs._o
+		rs.require = require
+	else
+		_G.vscode = require("vscode")
+    vim.notify = vscode.notify
+		rs.n = false
+		rs.c = true
+		rs.no = function(v, o)
+			return o
+		end
+		rs.require = function() end
+	end
+	return rs
+end)()
 
 function _G.dd(...)
 	local args = { ... }

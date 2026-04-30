@@ -3,17 +3,17 @@ local e = m.exports
 
 require("utils.capture")
 
-local zellij = require("hot.zellij")
 local buf = require("utils.vim_buf")
 local nvim_lua = vim.fn.exepath("nvim-lua")
+local ze = require("hot.actions.term").ze
 
 function e.open(path, reset)
 	local is_dir = vim.fn.isdirectory(path) == 1
 	if is_dir then
 		dd("Opening directory: " .. path)
 		vim.cmd("cd " .. path)
-		if reset ~= false then
-			zellij.kill()
+		if reset ~= false and ze then
+			ze():close_buf()
 		end
 	else
 		vim.cmd("edit " .. path)
@@ -28,7 +28,7 @@ function e.tere(action)
 		"tere",
 		action,
 		"-e 'NVIM=" .. vim.v.servername .. "'",
-		string.format("-a '%s --defer 10 -- %s -- -s'", nvim_lua, "vim.cmd.edit(v[1])"),
+		string.format("-a '%s --defer 10 -- %s -- -s'", nvim_lua, "hot.action_open(v[1])"),
 		string.format("-c '%s'", vim.fn.getcwd()),
 		string.format("-t '%s'", file_path),
 	}, " ")
@@ -42,5 +42,7 @@ function e.format_code()
 	end
 	require("conform").format({ buffn = vim.bo })
 end
+
+_G.hot.action_open = e.open
 
 return e
