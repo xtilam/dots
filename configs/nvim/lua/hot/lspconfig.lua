@@ -12,6 +12,7 @@ function setup()
 	add("jsonls")
 	add("rust")
 	add("tailwindcss")
+	add("clangd")
 
 	vim.lsp.enable({ "html", "cssls" })
 	vim.lsp.enable({ "bashls" })

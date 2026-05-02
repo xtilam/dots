@@ -82,6 +82,12 @@ function setup.projects(hk)
 end
 
 e.setup = function(hk)
+  if ze then
+    dd("Closing existing zellij session")
+    ze:close_buf()
+    ze = nil
+  end
+
 	for name, hk in pairs(hk) do
 		local fn = setup[name]
 		if fn then

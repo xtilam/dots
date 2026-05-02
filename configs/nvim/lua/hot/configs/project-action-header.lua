@@ -1,1 +1,0 @@
-local m = hot.add(...)

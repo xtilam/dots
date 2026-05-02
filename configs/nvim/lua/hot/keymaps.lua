@@ -46,7 +46,11 @@ km:set("n", "<leader>ff", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { desc
 km:set("n", "<leader>fc", "<cmd>Telescope commands<CR>", { desc = "Commands" })
 km:set("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "Buffers" })
 km:set("n", "<leader>fl", "<cmd>nohlsearch<CR>")
-km:set("n", "<leader>fs", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/state.lua<CR>", { desc = "Setting state" })
+
+km:set("n", "<leader>sl", "<cmd>e ./nvim.lua <CR>", { desc = "Local config" })
+km:set("n", "<leader>ss", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/state.lua<CR>", { desc = "Setting state" })
+km:set("n", "<leader>sk", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/keymaps.lua<CR>", { desc = "Setting keymaps" })
+km:set("n", "<leader>sp", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/configs/project-actions.lua<CR>", { desc = "Setting Projects" })
 km:set("n", "<M-l>", "<C-i>", { noremap = true, silent = true })
 km:set("n", "<M-h>", "<C-o>", { noremap = true, silent = true })
 km:set("n", "th", "[%", { remap = true, desc = "Go to matching pair" })
@@ -72,3 +76,5 @@ require("hot.actions.term").setup({
 })
 
 km:set("n", "<M-u>", function() end, { desc = "No action" })
+
+require("hot.configs.project-actions")

@@ -17,7 +17,11 @@ act() {
     ;;
   i)
     shift 1
-    # zellij run --a
+    zellij run -i -- "$@"
+    ;;
+  cli)
+    shift 1
+    zellij run -i -- "bash" "./cli.sh" "$@"
     ;;
   *)
     exit 0

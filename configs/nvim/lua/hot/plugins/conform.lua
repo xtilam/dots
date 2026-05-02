@@ -18,6 +18,8 @@ local cfg = {
 		nix = { "nixfmt" },
 		fish = { "custom_fish_indent" },
 		kdl = { "custom_kdlfmt" },
+		c = { "clang-format" },
+		cpp = { "clang-format" },
 	},
 	formatters = {
 		custom_fish_indent = {

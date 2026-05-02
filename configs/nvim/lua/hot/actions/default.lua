@@ -13,6 +13,7 @@ function e.open(path, reset)
 		dd("Opening directory: " .. path)
 		vim.cmd("cd " .. path)
 		if reset ~= false and ze then
+      hot.event_onchange_dir()
 			ze():close_buf()
 		end
 	else

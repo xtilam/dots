@@ -27,10 +27,7 @@ act() {
     endtime=$(($(timems) + timeout))
     target="$HOME/.tere_task"
     {
-      echo '>'$target
-      echo 'wtype -M ctrl -M alt n -m ctrl -m alt'
-      echo 'wtype -M ctrl -M alt f -m ctrl -m alt'
-      echo -n tere yazi_task --cwd $PWD --endtime $endtime
+      echo -n tere yazi_task --cwd $PWD --endtime $endtime -g
       if [[ "$#" -gt 0 ]]; then
         printf " %q" "$@"
       fi
@@ -39,7 +36,6 @@ act() {
       >"$target"
     wtype -M ctrl -M alt n -m ctrl -m alt
     wtype -M ctrl -M alt n -m ctrl -m alt
-    # wtype -M ctrl -M alt t -m ctrl -m alt
     ;;
   jq_args)
     shift 1
@@ -104,10 +100,11 @@ act() {
           shift 1
         fi
         ;;
-      --ghostty)
+      --ghostty | -g)
         shift 1
-        wtype -M ctrl -M alt n
-        wtype -M ctrl -M alt f
+        wtype -M ctrl -M alt n -m ctrl -m alt
+        wtype -M ctrl -M alt f -m ctrl -m alt
+        >"$HOME/.tere_task"
         ;;
       --wez-id)
         shift 1

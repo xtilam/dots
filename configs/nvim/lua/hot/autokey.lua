@@ -5,7 +5,7 @@ local AutoKey = e.AutoKey or {}
 AutoKey.__index = AutoKey
 
 function AutoKey:new()
-	return setmetatable({ hk = {} }, AutoKey)
+	return setmetatable({ hk = {}, childs = {} }, AutoKey)
 end
 
 function AutoKey:del(...)
@@ -32,11 +32,31 @@ function AutoKey:set(...)
 	end
 end
 
-function AutoKey:clear()
+function AutoKey:clear(no_child)
 	local hk = self.hk
 	for _, v in pairs(hk) do
 		self:del(v[1], v[2])
 	end
+
+	if self.childs then
+		for _, child in pairs(self.childs) do
+			child:clear()
+		end
+	end
+
+	if no_child then
+		self.childs = {}
+	end
+end
+
+function AutoKey:add_child(name)
+	local child = AutoKey:new()
+	self.childs[name] = child
+	return child
+end
+
+function AutoKey:get_child(name)
+	return self.childs[name]
 end
 
 e.AutoKey = AutoKey

@@ -131,7 +131,7 @@ function Module:auto_cmd(...)
 	end
 end
 
-function Module:run_cleanup()
+function Module:run_cleanup(no_clear)
 	for i = 1, #self._cleanup do
 		try_call(self._cleanup[i])
 	end
@@ -139,7 +139,11 @@ function Module:run_cleanup()
 	for i = 1, #self._auto_cmds do
 		try_call(vim.api.nvim_del_autocmd, self._auto_cmds[i])
 	end
-	self._cleanup = {}
+
+  if not no_clear then
+    self._cleanup = {}
+    self._auto_cmds = {}
+  end
 end
 
 function Module:fn(...)

@@ -1,4 +1,4 @@
-local cache = hot.add(...)
+hot.add(...)
 
 return function()
 	if vim.bo.buftype ~= "" then
