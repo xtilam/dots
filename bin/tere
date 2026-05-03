@@ -60,6 +60,7 @@ act() {
     act $TERE_YAZI "$@"
     ;;
   yazi_task)
+    >"$HOME/.tere_task"
     act=wl-copy
     shift 1
     while [ "$#" -gt 0 ]; do
@@ -104,7 +105,6 @@ act() {
         shift 1
         wtype -M ctrl -M alt n -m ctrl -m alt
         wtype -M ctrl -M alt f -m ctrl -m alt
-        >"$HOME/.tere_task"
         ;;
       --wez-id)
         shift 1

@@ -15,3 +15,10 @@ table.filter_no = function(t, value)
 		return v ~= value
 	end)
 end
+table.from = function(length, callback)
+	local t = {}
+	for i = 1, length do
+		t[i] = callback(i)
+	end
+	return t
+end

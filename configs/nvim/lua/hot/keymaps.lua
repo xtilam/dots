@@ -4,14 +4,9 @@ local act = require("hot.actions.default")
 local buf = require("utils.vim_buf")
 local s = require("hot.state")
 
+
 m:on_reload(function()
-	if s.copilot ~= 1 then
-		vim.cmd("Copilot disable")
-		return
-	end
-	if not s.is_copilot_running() then
-		vim.cmd("Copilot enable")
-	end
+	s.set_copilot(s.copilot)
 end)
 
 local code_action = function(ctx)
@@ -50,7 +45,12 @@ km:set("n", "<leader>fl", "<cmd>nohlsearch<CR>")
 km:set("n", "<leader>sl", "<cmd>e ./nvim.lua <CR>", { desc = "Local config" })
 km:set("n", "<leader>ss", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/state.lua<CR>", { desc = "Setting state" })
 km:set("n", "<leader>sk", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/keymaps.lua<CR>", { desc = "Setting keymaps" })
-km:set("n", "<leader>sp", "<cmd>e ~/dev-configs/configs/nvim/lua/hot/configs/project-actions.lua<CR>", { desc = "Setting Projects" })
+km:set(
+	"n",
+	"<leader>sp",
+	"<cmd>e ~/dev-configs/configs/nvim/lua/hot/configs/project-define.lua<CR>",
+	{ desc = "Setting Projects" }
+)
 km:set("n", "<M-l>", "<C-i>", { noremap = true, silent = true })
 km:set("n", "<M-h>", "<C-o>", { noremap = true, silent = true })
 km:set("n", "th", "[%", { remap = true, desc = "Go to matching pair" })
@@ -76,5 +76,3 @@ require("hot.actions.term").setup({
 })
 
 km:set("n", "<M-u>", function() end, { desc = "No action" })
-
-require("hot.configs.project-actions")

@@ -2,8 +2,10 @@ local m = hot.add(...)
 local e = m.exports
 
 local Term = require("FTerm.terminal")
+local U = require("FTerm.utils")
 local km = require("hot.autokey").km
 local mhk = m:get("mhk", {})
+local curTerm = nil
 
 Term.sizes = {
 	height = { 0.5, 0.75, 1 },
@@ -33,8 +35,9 @@ function Term:get_change_demensions_callback(config)
 		self:apply_dimensions()
 	end
 end
+
 function Term:update_dimensions(prop, step)
-	local list = Term.sizes[prop]
+	local list = self._sizes[prop] or Term.sizes[prop]
 	local dimensions = self.config.dimensions
 	if not list then
 		return
@@ -59,9 +62,40 @@ function Term:update_dimensions(prop, step)
 	return self
 end
 
-function Term:apply_dimensions()
+function Term:config_size(dimensions, sizes)
+	if sizes then
+		self._sizes = sizes
+	else
+		self._sizes = {}
+	end
+	for k, v in pairs(dimensions) do
+		if Term.sizes[k] == "table" then
+			self.config.dimensions[k] = v
+			self.update_dimensions(k, 0)
+		end
+	end
+	self:apply_dimensions(true)
+	return self
+end
+function Term:apply_dimensions(check_win)
+	if check_win and not (self.win and U.is_win_valid(self.win)) then
+		return
+	end
+
+	if self._on_resize then
+		pcall(self._on_resize, self.config.dimensions, self)
+	end
+
 	self:close()
 	self:open()
+end
+
+function Term:on_resize(fn)
+	if type(fn) ~= "function" then
+		fn = nil
+	end
+	self._on_resize = fn
+	return self
 end
 
 function Term:start()
@@ -77,13 +111,18 @@ function Term:start()
 			end, { buffer = self.buf })
 		end
 	end
+
 	for idx = 1, #list_hk do
 		local i = list_hk[idx]
 		vim.keymap.set(i[1], i[2], i[3], { buffer = self.buf })
 	end
+
+	curTerm = self
 end
 function Term:init(...)
-	return require("FTerm"):new(...)
+	local term = require("FTerm"):new(...)
+	term._sizes = {}
+	return term
 end
 
 function Term:use_hot_clean(m)
@@ -131,5 +170,12 @@ function Term:hk_global(hk, hk_buf)
 end
 
 e.Term = Term
-
+m:auto_cmd("VimResized", {
+	pattern = "*",
+	callback = function()
+		if curTerm then
+			curTerm:apply_dimensions(true)
+		end
+	end,
+})
 return e

@@ -4,8 +4,16 @@ local e = m.exports
 local constants = require("hot.constants")
 local Term = require("hot.float-term").Term
 local setup = {}
-
 local ze = nil
+function cacheTerm(name, opts)
+	local term = m:get(name, function()
+		return Term:init(opts)
+	end)
+	for k, v in pairs(opts) do
+		term.config[k] = v
+	end
+	return term
+end
 
 function e.open(path, reset)
 	local is_dir = vim.fn.isdirectory(path) == 1
@@ -21,7 +29,7 @@ function e.open(path, reset)
 end
 
 function setup.copilot(hk)
-	local t = Term:init({
+	local t = cacheTerm("copilot", {
 		ft = "copilot",
 		cmd = "bash " .. constants.bin_file("copilot-task"),
 		dimensions = {
@@ -32,7 +40,11 @@ function setup.copilot(hk)
 		},
 	})
 	t:hk_global(hk, {
-		{ "toggle", t.close },
+		{
+			"toggle",
+			t.toggle,
+		},
+		{ "<M-q>", bind(t.toggle, t) },
 		{ "<M-l>", t:get_change_demensions_callback({ x = 1 }) },
 		{ "<M-h>", t:get_change_demensions_callback({ x = -1 }) },
 		{ "<M-->", t:get_change_demensions_callback({ width = -1 }) },
@@ -51,13 +63,13 @@ function setup.zellij(hk)
 		dimensions = {
 			height = 2,
 			width = 1,
-      x = 1,
+			x = 1,
 		},
 	})
 	ze:hk_global(hk, {
 		{ "toggle", ze.close },
 		{ "<M-S-L>", ze:get_change_demensions_callback({ x = 1 }) },
-		{ "<M-S-H>",ze:get_change_demensions_callback({ x = -1 }) },
+		{ "<M-S-H>", ze:get_change_demensions_callback({ x = -1 }) },
 		{ "<M-->", ze:get_change_demensions_callback({ width = -1 }) },
 		{ "<M-=>", ze:get_change_demensions_callback({ width = 1 }) },
 	})
@@ -65,28 +77,29 @@ function setup.zellij(hk)
 end
 
 function setup.projects(hk)
-	local t = Term:init({
-		cmd = [[dir=$(ff --cd) && nvim-lua --defer 10 -- "require('hot.actions.term').open('$dir', 1)" || true]],
+	local t = cacheTerm("projects", {
+		cmd = [[dir=$(ff --cd) && nvim-lua --defer 10 -- "hot.action_open(v[1])" -- -s "$dir" || true]],
 		auto_close = true,
 		border = "none",
 		dimensions = {
 			height = 2,
 			width = 0.7,
 			x = 1,
+			y = 0,
 		},
 	})
 	t:hk_global(hk, {
 		{ "toggle", t.close },
 	})
+
 	m:on_clean(t:get_clean_callback())
 end
 
 e.setup = function(hk)
-  if ze then
-    dd("Closing existing zellij session")
-    ze:close_buf()
-    ze = nil
-  end
+	if ze then
+		ze:close_buf()
+		ze = nil
+	end
 
 	for name, hk in pairs(hk) do
 		local fn = setup[name]
@@ -101,48 +114,3 @@ e.ze = function()
 end
 
 return e
-
--- function e.copilot()
--- 	copilot:open()
--- 	if copilot.buf ~= copilot.hk_buf or is_dev then
--- 		copilot.hk_buf = copilot.buf
--- 		-- vim.keymap.set("t", "<M-t>", function()
--- 		-- 	copilot:close()
--- 		-- end, { buffer = copilot.buf, desc = "Close Copilot" })
---
--- 	-- 	vim.keymap.set("t", "<M-l>", function()
--- 	-- 		copilot:update_dimensions("x", 1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	--
--- 	-- 	vim.keymap.set("t", "<M-h>", function()
--- 	-- 		copilot:update_dimensions("x", -1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	--
--- 	-- 	vim.keymap.set("t", "<M-j>", function()
--- 	-- 		copilot:update_dimensions("height", 1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	--
--- 	-- 	vim.keymap.set("t", "<M-k>", function()
--- 	-- 		copilot:update_dimensions("height", -1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	--
--- 	-- 	vim.keymap.set("t", "<M-->", function()
--- 	-- 		copilot:update_dimensions("width", -1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	--
--- 	-- 	vim.keymap.set("t", "<M-=>", function()
--- 	-- 		copilot:update_dimensions("width", 1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	--
--- 	-- 	vim.keymap.set("t", "<M-=>", function()
--- 	-- 		copilot:update_dimensions("width", 1)
--- 	-- 		copilot:apply_dimensions()
--- 	-- 	end, { buffer = copilot.buf })
--- 	-- end
--- end

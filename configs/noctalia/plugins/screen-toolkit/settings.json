@@ -1,23 +1,4 @@
 {
-  "stateIsRunning": false,
-  "stateActiveTool": "",
-  "transAvailable": true,
-  "stateMirrorVisible": false,
-  "resultHex": "#9E88FF",
-  "resultRgb": "rgb(158, 136, 255)",
-  "resultHsv": "hsv(251, 47%, 100%)",
-  "resultHsl": "hsl(251, 100%, 77%)",
-  "colorCapturePath": "/tmp/screen-toolkit-colorpicker.png",
-  "paletteColors": [
-    "#62605D",
-    "#A3A498",
-    "#C4BB9A",
-    "#D1CDA9",
-    "#F5F6BB",
-    "#E1E3D0",
-    "#FFFFFD",
-    "#FEFEFC"
-  ],
   "colorHistory": [
     "#9E88FF",
     "#F0F8FF",
@@ -27,6 +8,16 @@
     "#F5F5F5",
     "#0D2452",
     "#409BE6"
+  ],
+  "paletteColors": [
+    "#62605D",
+    "#A3A498",
+    "#C4BB9A",
+    "#D1CDA9",
+    "#F5F6BB",
+    "#E1E3D0",
+    "#FFFFFD",
+    "#FEFEFC"
   ],
   "installedLangs": [
     "afr",
@@ -157,7 +148,20 @@
     "yid",
     "yor"
   ],
+  "transAvailable": true,
+  "selectedOcrLang": "eng",
+  "screenshotPath": "",
+  "videoPath": "",
+  "filenameFormat": "",
   "detectedRecorder": "wf-recorder",
   "detectedCompositor": "niri",
+  "stateIsRunning": false,
+  "stateActiveTool": "",
+  "stateMirrorVisible": false,
+  "resultHex": "#9E88FF",
+  "resultRgb": "rgb(158, 136, 255)",
+  "resultHsv": "hsv(251, 47%, 100%)",
+  "resultHsl": "hsl(251, 100%, 77%)",
+  "colorCapturePath": "/tmp/screen-toolkit-colorpicker.png",
   "colorCacheBust": 1776450101927
 }

@@ -6,6 +6,10 @@ local stack_loaded = {}
 _G.hot = M
 _G.hot.debugger = false
 
+---@generic T
+---@param func fun(...): T
+---@vararg any
+---@return T|nil
 local function try_call(func, ...)
 	local isOk, rs = pcall(func, ...)
 	if not isOk then
@@ -31,12 +35,14 @@ local function reset(module_name)
 	if modules_data[module_name] == nil then
 		return
 	end
+
 	package.loaded[module_name] = nil
 	for module, _ in pairs(auto_reload_modules) do
 		package.loaded[module] = nil
 	end
 
 	try_load(module_name)
+
 	for module, _ in pairs(auto_reload_modules) do
 		try_load(module)
 	end
@@ -47,7 +53,17 @@ local function reset(module_name)
 
 	stack_loaded = {}
 end
+
 _G.hot.reset = reset
+
+---@generic T
+---@param module_name string
+---@return T
+_G.hot.try_require = function(module_name)
+	package.loaded[module_name] = nil
+	return try_load(module_name)
+end
+
 local Cache = {}
 Cache.__index = Cache
 local Module = {}
@@ -108,15 +124,20 @@ function Module:new()
 		cache = Cache:new(),
 		exports = {},
 		reloaded = 0,
+		_deps = {},
 		_cleanup = {},
 		_auto_cmds = {},
 	}, Module)
 end
 
+---@generic T
+---@param callback fun(r): T
+---@return T
 function Module:on_reload(callback)
 	if self.reloaded > 0 then
-		try_call(callback)
+		return try_call(callback, hot.try_require)
 	end
+	return self.reloaded
 end
 
 function Module:on_clean(callback)
@@ -140,10 +161,10 @@ function Module:run_cleanup(no_clear)
 		try_call(vim.api.nvim_del_autocmd, self._auto_cmds[i])
 	end
 
-  if not no_clear then
-    self._cleanup = {}
-    self._auto_cmds = {}
-  end
+	if not no_clear then
+		self._cleanup = {}
+		self._auto_cmds = {}
+	end
 end
 
 function Module:fn(...)
@@ -183,7 +204,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 		local module_name = path:match("lua/(.-)%.lua$")
 		if module_name then
 			module_name = module_name:gsub("/", ".")
-      reset(module_name)
+			reset(module_name)
 		end
 	end,
 })

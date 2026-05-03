@@ -15,7 +15,7 @@ _G.cc = (function()
 		rs.require = require
 	else
 		_G.vscode = require("vscode")
-    vim.notify = vscode.notify
+		vim.notify = vscode.notify
 		rs.n = false
 		rs.c = true
 		rs.no = function(v, o)
@@ -33,6 +33,10 @@ function _G.dd(...)
 	end
 
 	vim.notify(vim.inspect(args))
+end
+
+function _G.module_path(module_name)
+	return package.searchpath(module_name, package.path)
 end
 
 function _G.bind(callback, ...)
@@ -53,7 +57,7 @@ function _G.copy(str)
 end
 
 function _G._fn(code, ...)
-	local fn_code = ([[return function{code}end]]):fm({ code = code })
+	local fn_code = ([[return function{code} end]]):fm({ code = code })
 	local ok, module = pcall(load, fn_code)
 	local fn = function()
 		vim.notify("Error in lambda: " .. fn_code, vim.log.levels.ERROR)
@@ -62,8 +66,11 @@ function _G._fn(code, ...)
 	if ok then
 		fn = module()
 	end
-
 	return bind(fn, ...)
+end
+
+function _G._fna(code)
+	return _fn("(...) local a={...}; " .. code)
 end
 
 function _G.fake_combo(key, delay)
@@ -87,4 +94,21 @@ function _G.try_load(module)
 		return nil
 	end
 	return mod
+end
+
+_G.debounce = function(fn, delay)
+	local timer_id = nil
+	return function(...)
+		local args = { ... }
+		if timer_id then
+			vim.loop.timer_stop(timer_id)
+			vim.loop.close(timer_id)
+		end
+		timer_id = vim.loop.new_timer()
+		timer_id:start(delay, 0, function()
+			vim.schedule(function()
+				fn(unpack(args))
+			end)
+		end)
+	end
 end

@@ -13,6 +13,7 @@ function setup()
 	add("rust")
 	add("tailwindcss")
 	add("clangd")
+	add("zig")
 
 	vim.lsp.enable({ "html", "cssls" })
 	vim.lsp.enable({ "bashls" })

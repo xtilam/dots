@@ -26,8 +26,9 @@ local ensure_installed = {
 	"yaml",
 	"css",
 	"scss",
-  "jsx",
-  "tsx",
+	"jsx",
+	"tsx",
+	"zig",
 }
 
 m:auto_cmd("FileType", {

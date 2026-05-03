@@ -24,7 +24,7 @@ local copilot = {
 		return icon .. " "
 	end),
 	cond = function()
-		return state.is_copilot_running()
+		return state.copilot == 1
 	end,
 	color = m:fn("copilot_color", function()
 		return { fg = "#6cc644" }

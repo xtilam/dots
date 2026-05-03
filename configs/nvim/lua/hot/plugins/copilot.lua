@@ -1,7 +1,19 @@
+hot.add(...)
+
 local s = require("hot.state")
 
-s.is_copilot_running = function()
-	return #vim.lsp.get_clients({ name = "copilot", bufnr = 0 }) > 0
+function s.set_copilot(value)
+	local isRunning = #vim.lsp.get_clients({ name = "copilot", bufnr = 0 }) > 0
+	local check_value = value == 1
+	if check_value ~= isRunning then
+		if value then
+			vim.cmd.Copilot("enable")
+		else
+			vim.cmd.Copilot("disable")
+		end
+	end
+
+	s.copilot = value
 end
 
 return {
@@ -11,9 +23,8 @@ return {
 		build = ":Copilot auth",
 		event = "InsertEnter",
 		opts = {
-			enabled = s.copilot == 1,
+			enabled = false,
 			suggestion = {
-				enabled = true,
 				auto_trigger = true,
 				trigger_on_accept = true,
 				debounce = 25,
