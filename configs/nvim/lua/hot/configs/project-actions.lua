@@ -61,9 +61,10 @@ function e.trust(d, opts)
 
 		if startWith then
 			if d:sub(1, #startWith) ~= startWith then
-				dd(d, local_config_path)
 				return
 			end
+		else
+			return
 		end
 	end
 

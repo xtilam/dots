@@ -15,6 +15,18 @@ act() {
     listen="unix:/tmp/mykitty-$pid"
     kitty @ launch --to $listen --type overlay "$0" yazi_task --cwd "$PWD" --kitty 1 "$@"
     ;;
+  kitty_overlay)
+    tmp_file="/tmp/tere.log"
+    >"$tmp_file"
+    kitten quick-access-terminal "$0" yazi_task --cwd "$PWD" -w "$tmp_file" "$@"
+    rs=$(cat "$tmp_file")
+    if [ -z "$rs" ]; then
+      echo "No file selected."
+      return 1
+    else
+      echo "$rs"
+    fi
+    ;;
   wezterm_yazi)
     export WEZTERM_UNIX_SOCKET="/tmp/wezterm-desktop"
     export WEZTERM_PANE=$(wezterm cli list-clients --format=json | jq "map(select(.username == \"$USER\")) | .[0].focused_pane_id")
@@ -61,6 +73,7 @@ act() {
     ;;
   yazi_task)
     >"$HOME/.tere_task"
+    file_write=""
     act=wl-copy
     shift 1
     while [ "$#" -gt 0 ]; do
@@ -97,9 +110,12 @@ act() {
         shift 1
         if [ -n "$1" ]; then
           act="$1"
-          echo $act
           shift 1
         fi
+        ;;
+      -w | --write)
+        file_write="$2"
+        shift 2
         ;;
       --ghostty | -g)
         shift 1
@@ -143,7 +159,11 @@ act() {
     fi
     file=$(yazi --chooser-file=/dev/stdout $YAZI_TARGET || true)
     if [ -n "$file" ]; then
-      $act "$file" || ([ -n "$skip_err" ] && echo "Failed when executing: $act $file")
+      if [ -n "$file_write" ]; then
+        echo "$file" >"$file_write"
+      else
+        $act "$file" || ([ -n "$skip_err" ] && echo "Failed when executing: $act $file")
+      fi
     fi
     $close_act
     ;;
@@ -159,4 +179,4 @@ act() {
 # kitty @ close-window -m id:$KITTY_WINDOW_ID'
 
 [ $# -gt 0 ] && cmd=$1 && shift || cmd=""
-act "$cmd" "$@"
+act "$cmd" "$@" || exit 1

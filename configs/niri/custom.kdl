@@ -52,7 +52,7 @@ layout {
 		color "#0007"
 	}
 }
-// spawn-at-startup "waybar"
+// spawn-at-startup "fd kitty-quick-term /tmp"
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 animations {
 
@@ -60,9 +60,14 @@ animations {
 window-rule {
 	match app-id="^org\\.wezfurlong\\.wezterm$"
 	default-column-width {
-
 	}
 }
+// window-rule {
+//   match app-id="dropdown"
+//   open-floating true
+//   default-floating-position x=10% y=10%
+//   default-column-width { fixed 1500; }
+// }
 window-rule {
 	match app-id="firefox$" title="^Picture-in-Picture$"
 	open-floating true
@@ -167,9 +172,9 @@ binds {
 	// the first or last window in a column.
 	// Mod+J	 { focus-window-down; }
 	// Mod+K	 { focus-window-up; }
-	Mod+Ctrl+J {
-    spawn-sh "niri msg action focus-window-left"
-	}
+	// Mod+Ctrl+J {
+	//    spawn-sh "niri msg action focus-window-left"
+	// }
 	// Mod+Ctrl+K {
 	// 	move-window-up-or-to-workspace-up
 	// }
@@ -245,14 +250,14 @@ binds {
 	Mod+Page_Up {
 		focus-workspace-up
 	}
-	Mod+I {
+	Mod+Ctrl+k{
       spawn-sh r#"
 niri msg action focus-column-right
 niri msg action focus-window-up
 niri msg action focus-column-left
 "#
 	}
-	Mod+U {
+	Mod+Ctrl+j {
       spawn-sh r#"
 niri msg action focus-column-right
 niri msg action focus-window-down

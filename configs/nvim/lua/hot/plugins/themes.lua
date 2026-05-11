@@ -1,8 +1,5 @@
 local m = hot.add(...)
 
--- local function term_color()
--- end
-
 local set_theme = function(theme)
 	vim.defer_fn(function()
 		vim.cmd.colorscheme(theme)

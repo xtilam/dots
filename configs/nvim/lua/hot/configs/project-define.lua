@@ -8,6 +8,7 @@ e.setup = function(dir)
 	trust(dir, { parrent_dir = "/home/z41/projects/mindmap" })
 	trust(dir, { parrent_dir = "/home/z41/projects/zig-memory" })
 	trust(dir, { parrent_dir = "/home/z41/projects/bun-memo" })
+	trust(dir, { parrent_dir = "/home/z41/projects/lua-demo" })
 end
 
 e.act = m:on_reload(function(require)

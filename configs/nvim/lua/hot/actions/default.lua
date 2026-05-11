@@ -4,7 +4,7 @@ local e = m.exports
 require("utils.capture")
 
 local buf = require("utils.vim_buf")
-local nvim_lua = vim.fn.exepath("nvim-lua")
+local tere_task = require("hot.constants").tere_task
 local ze = require("hot.actions.term").ze
 
 function e.open(path, reset)
@@ -13,7 +13,7 @@ function e.open(path, reset)
 		dd("Opening directory: " .. path)
 		vim.cmd("cd " .. path)
 		if reset ~= false and ze then
-      hot.event_onchange_dir()
+			hot.event_onchange_dir()
 			ze():close_buf()
 		end
 	else
@@ -24,17 +24,12 @@ end
 function e.tere(action)
 	local cwd = vim.fn.getcwd()
 	local file_path = buf.is_file() and buf.file_path() or cwd
-
-	local cli = table.concat({
-		"tere",
-		action,
-		"-e 'NVIM=" .. vim.v.servername .. "'",
-		string.format("-a '%s --defer 10 -- %s -- -s'", nvim_lua, "hot.action_open(v[1])"),
-		string.format("-c '%s'", vim.fn.getcwd()),
-		string.format("-t '%s'", file_path),
-	}, " ")
-
-	os.capture(cli)
+	vim.fn.jobstart({
+		"bash",
+		tere_task,
+		vim.fn.getcwd(),
+		file_path,
+	})
 end
 
 function e.format_code()

@@ -51,6 +51,7 @@ km:set(
 	"<cmd>e ~/dev-configs/configs/nvim/lua/hot/configs/project-define.lua<CR>",
 	{ desc = "Setting Projects" }
 )
+
 km:set("n", "<M-l>", "<C-i>", { noremap = true, silent = true })
 km:set("n", "<M-h>", "<C-o>", { noremap = true, silent = true })
 km:set("n", "th", "[%", { remap = true, desc = "Go to matching pair" })
@@ -60,15 +61,17 @@ km:set({ "n", "i" }, "<M-S-F>", act.format_code, { desc = "Conform format" })
 km:set({ "n" }, "<leader>cf", act.format_code, { desc = "Conform format" })
 km:set("n", "<leader>cc", _fn("(f)copy(f())", buf.file_path), { desc = "Copy path" })
 km:set("n", "<leader>cd", _fn("(f)copy(f())", vim.fn.getcwd), { desc = "Copy CWD" })
+km:set("n", "<leader>ce", vim.diagnostic.open_float , { desc = "Show diagnostic line" })
 km:set({ "n", "i", "v" }, "<M-n>", bind(act.tere, "yazi"), { desc = "Tere yazi" })
 km:set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 km:set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+
 if cc.n then
 	km:set("n", "tw", require("hot.hydra.window").start, { desc = "Window Mode" })
 end
+
 km:set("n", "tv", "gvo<Esc>", { desc = "Go to end last visual" })
 km:set("v", "u", function() end, { desc = "Override lowercase" })
-
 require("hot.actions.term").setup({
 	copilot = "<M-t>",
 	projects = "<M-p>",

@@ -21,3 +21,13 @@ vim.opt.writebackup = false
 vim.opt.undofile = true
 
 -- require("themes.dracula").setup()
+if vim.g.neovide then
+	vim.o.guifont = "Cascadia Code NF:h14" -- text below applies for VimScript
+	vim.g.neovide_no_idle = true
+	vim.g.neovide_title_background_color = "0" -- Cái này tùy chọn
+	vim.g.neovide_floating_blur_amount_x = 2.0
+	vim.g.neovide_floating_blur_amount_y = 2.0
+	-- Dòng chính đây:
+	vim.g.neovide_input_use_logo = 1
+	vim.g.neovide_cursor_animation_length = 0.13
+end

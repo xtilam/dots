@@ -5,6 +5,7 @@ local constants = require("hot.constants")
 local Term = require("hot.float-term").Term
 local setup = {}
 local ze = nil
+
 function cacheTerm(name, opts)
 	local term = m:get(name, function()
 		return Term:init(opts)

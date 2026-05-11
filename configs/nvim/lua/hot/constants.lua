@@ -6,5 +6,6 @@ e.bin_file = function(name)
 end
 
 e.nvim_remote = e.bin_path .. "nvim_remote_open.sh"
+e.tere_task = e.bin_path .. "tere_task.sh"
 
 return e

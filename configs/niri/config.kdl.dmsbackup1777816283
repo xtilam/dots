@@ -1,6 +1,5 @@
 include "custom.kdl"
 include "input.kdl"
-include "dms/binds.kdl"
 
 // include "nix.kdl"
  // // This config is in the KDL format: https://kdl.dev
@@ -798,5 +797,3 @@ include "dms/binds.kdl"
 //	   }
 // }
 
-
-include "dms/windowrules.kdl"

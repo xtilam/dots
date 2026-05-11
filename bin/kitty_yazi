@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+echo $KITTY_LISTEN_ON | grep "kitty-quick-term" && kitten quick-access-terminal && exit 0
+socket=$(mktemp -u /tmp/kitty_yazi_socket.XXXXXX)
+
+cwd="$2"
+target="$1"
+
+if [[ -z "$cwd" ]]; then
+  cwd=$(pwd)
+fi
+
+if [[ -z "$target" ]]; then
+  target="$cwd"
+fi
+
+yazi_task() {
+  if [[ "$(kitty @ ls | jq "[.[] | .is_focused ][0]")" == "false" ]]; then
+    kitten quick-access-terminal
+  fi
+
+  cd $2
+  file=$(YAZI_TARGET="$3" YAZI_CWD="$2" yazi --chooser-file=/dev/stdout)
+  echo $file | nc -U "$1"
+  kitten quick-access-terminal
+}
+
+handle_request() {
+  if [[ -n "$1" ]]; then
+    echo $1
+    exit 0
+  else
+    exit 1
+  fi
+}
+
+while true; do
+  quick_term=$(fd kitty-quick-term /tmp)
+  if [[ -n "$quick_term" ]]; then
+    break
+  fi
+  kitten quick-access-terminal --detach
+  sleep 0.1
+done
+
+kitty_remote="unix:$quick_term"
+code="$(declare -f yazi_task);"'yazi_task $1 $2 $3'
+window_id=$(kitty @ launch --type=overlay --to="$kitty_remote" bash -c "$code" -- "$socket" "$cwd" "$target")
+
+while read -r line; do
+  handle_request "$line"
+done < <(nc -lU "$socket" 2>/dev/null)

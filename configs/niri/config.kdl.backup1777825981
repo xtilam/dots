@@ -798,5 +798,3 @@ include "dms/binds.kdl"
 //	   }
 // }
 
-
-include "dms/windowrules.kdl"
