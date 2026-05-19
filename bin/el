@@ -3,11 +3,25 @@ layout_name() {
   echo $([[ -n "$1" ]] && echo "$1" || echo "ze")".kdl"
 
 }
+zellij_layout() {
+  zellij action new-tab --layout "$1"
+}
+
 act() {
   case "$1" in
+  ee)
+    zellij_layout zis 
+    ;;
+  ec)
+    zellij_layout compact
+    ;;
+  load)
+    layout=$(layout_name "$2")
+    zellij action override-layout "$layout" --retain-existing-plugin-panes
+    ;;
   dump)
     layout_name=$(layout_name "$2")
-    zellij action dump-layout > $layout_name
+    zellij action dump-layout >$layout_name
     ;;
   tab)
     layout_name=$(layout_name "$2")
@@ -24,6 +38,7 @@ act() {
     zellij run -i -- "bash" "./cli.sh" "$@"
     ;;
   *)
+    echo "Usage: $0 {dump|tab|i|cli} [args...]"
     exit 0
     ;;
   esac

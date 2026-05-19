@@ -29,7 +29,7 @@ local cfg = {
 		custom_kdlfmt = {
 			command = "sh",
 			args = function()
-				return { "-c", "kdlfmt format --kdl-version=$1 - | unexpand -t 4", "--", "v" .. state.kdlversion }
+				return { "-c", "kdl-fmt -i 1 --from-$1 --to-$1 - | unexpand -t 1", "--", "v" .. state.kdlversion }
 			end,
 		},
 	},

@@ -1,0 +1,30 @@
+layout {
+	pane size=1 borderless=true {
+		plugin location="zis" {
+			format_center "{mode}"
+			format_right "{swap_layout}{datetime}"
+			format_left "#[fg=#FFFFFF,bg=#1447E6,bold] {session} #[fg=#1447E6,bg=none]{tabs}"
+
+			format_space ""
+			border_enabled "false"
+
+			mode_normal "#[fg=#FFFFFF,bg=none]#[fg=#000000,bg=#FFFFFF,bold] {name} #[fg=#FFFFFF,bg=none]"
+			mode_tmux "#[fg=#ca3500,bg=none]#[fg=#FFFFFF,bg=#ca3500,bold] {name} #[fg=#ca3500,bg=none]"
+			mode_default_to_mode "tmux"
+
+			format_space "#[bg=none]"
+			tab_normal "#[fg=#4C4C59,bg=none]#[fg=#000000,bg=#4C4C59] {index}  {name} #[fg=#4C4C59,bg=none]"
+			tab_normal_fullscreen "#[fg=#4C4C59,bg=none]#[fg=#000000,bg=#4C4C59] {index}  {name} [] #[fg=#4C4C59,bg=none]"
+			tab_active "#[fg=#FFFFFF,bg=none]#[fg=#000000,bg=#FFFFFF] {index}  {name} #[fg=#FFFFFF,bg=none]"
+			tab_active_fullscreen "#[fg=#FFFFFF,bg=none]#[fg=#000000,bg=#FFFFFF] {index}  {name} [] #[fg=#FFFFFF,bg=none]"
+
+			swap_layout_format "#[fg=#000000,bg=#008236] {name} #[fg=#008236,bg=none]"
+			swap_layout_hide_if_empty "true"
+
+			datetime "#[fg=#1447E6,bg=none]#[fg=#FFFFFF,bg=#1447E6] {format} "
+			datetime_format "%A, %d %b %H:%M"
+			datetime_timezone "Etc/GMT-7"
+		}
+	}
+	pane
+}

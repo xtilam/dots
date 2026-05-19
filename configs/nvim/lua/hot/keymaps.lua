@@ -23,6 +23,7 @@ end, { desc = "Rename Lsp" })
 
 km:set({ "n" }, "tj", bind(code_action, nil), { desc = "Code Action" })
 km:set({ "v" }, "v", "V", { desc = "Visual line" })
+km:set("v", "<leader>r", ":s###g<Left><Left><Left>")
 
 km:set({ "n" }, "tk", bind(code_action, { context = { only = { "source" } } }), { desc = "Source Action" })
 km:set({ "n" }, "tn", "gra", { desc = "Source action" })
@@ -73,9 +74,9 @@ end
 km:set("n", "tv", "gvo<Esc>", { desc = "Go to end last visual" })
 km:set("v", "u", function() end, { desc = "Override lowercase" })
 require("hot.actions.term").setup({
-	copilot = "<M-t>",
 	projects = "<M-p>",
-	zellij = "<M-m>",
+	-- copilot = "<M-t>",
+	-- zellij = "<M-m>",
 })
 
 km:set("n", "<M-u>", function() end, { desc = "No action" })

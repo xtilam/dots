@@ -1,0 +1,28 @@
+layout {
+	pane size=1 borderless=true {
+		plugin location="file:///home/z41/dev-configs/configs/zellij/plugins/zjstatus.wasm" {
+			format_center "{mode}"
+			format_space ""
+			border_enabled "false"
+			border_char "─"
+			border_format "#[fg=#6C7086]{char}"
+			mode_normal "#[fg=black,bg=white] #[fg=black,bg=white]{name} #[fg=white,bg=black]"
+			mode_tmux   "#[fg=black,bg=red] #[fg=white,bg=red]{name} #[fg=red,bg=black]"
+			// mode_pane   "#[fg=black,bg=blue] #[fg=white,bg=blue]{name} #[fg=blue,bg=black]"
+			mode_default_to_mode "tmux"
+			format_left "#[fg=black,bg=blue,bold] {session} #[fg=blue,bg=#181825]{tabs}"
+			format_right "{datetime}"
+			format_space "#[bg=#181825]"
+			tab_normal "#[fg=#181825,bg=#4C4C59] #[fg=#000000,bg=#4C4C59]{index}  {name} #[fg=#4C4C59,bg=#181825]"
+			tab_normal_fullscreen "#[fg=#6C7086,bg=#181825] {index} {name} [] "
+			tab_normal_sync "#[fg=#6C7086,bg=#181825] {index} {name} <> "
+			tab_active "#[fg=#181825,bg=#ffffff,bold,italic] {index}  {name} #[fg=#ffffff,bg=#181825]"
+			tab_active_fullscreen "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} [] "
+			tab_active_sync "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} <> "
+			datetime "#[fg=black,bg=blue]#[fg=white,bg=blue] {format} "
+			datetime_format "%A, %d %b %H:%M"
+			datetime_timezone "Etc/GMT-7"
+		}
+	}
+	pane
+}

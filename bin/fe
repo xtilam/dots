@@ -38,7 +38,7 @@ fe() {
     $cli | fzf \
       --bind "enter:execute($0 attach {})+clear-query" \
       --bind "ctrl-r:$reload" \
-      --bind "ctrl-c:clear-query" \
+      --bind "ctrl-l:clear-query" \
       --bind "delete:execute($0 kill {})+$reload" \
       --bind "ctrl-delete:execute($0 delete {})+$reload" \
       --bind 'alt-`:abort' \

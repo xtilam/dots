@@ -52,7 +52,10 @@ layout {
 		color "#0007"
 	}
 }
-// spawn-at-startup "fd kitty-quick-term /tmp"
+
+
+spawn-sh-at-startup "fd kitty-quick-term /tmp | xargs -I {} rm {}"
+spawn-sh-at-startup "fcitx5 -d"
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 animations {
 
@@ -82,13 +85,7 @@ binds {
 		show-hotkey-overlay
 	}
 	Mod+T hotkey-overlay-title="Open a Terminal" {
-		spawn "ghostty"
-	}
-	Mod+Space hotkey-overlay-title="Run an Application: fuzzel" {
-		spawn "fuzzel"
-	}
-	Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" {
-		spawn "swaylock"
+		spawn "kitty"
 	}
 	Super+Alt+S allow-when-locked=true hotkey-overlay-title=null {
 		spawn-sh "pkill orca || exec orca"
@@ -250,14 +247,14 @@ binds {
 	Mod+Page_Up {
 		focus-workspace-up
 	}
-	Mod+Ctrl+k{
+	Mod+I{
       spawn-sh r#"
 niri msg action focus-column-right
 niri msg action focus-window-up
 niri msg action focus-column-left
 "#
 	}
-	Mod+Ctrl+j {
+	Mod+U {
       spawn-sh r#"
 niri msg action focus-column-right
 niri msg action focus-window-down
@@ -529,6 +526,9 @@ niri msg action focus-column-left
 	Mod+Shift+P {
 		power-off-monitors
 	}
+  Mod+n{
+		spawn-sh "bash ~/dev-configs/bin/script/niri-kitty-yazi.sh"
+  } 
 }
 recent-windows {
 	binds {

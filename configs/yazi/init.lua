@@ -1,1 +1,1 @@
--- require("tere"):setup({})
+require("tere"):setup({})

@@ -56,9 +56,7 @@ end
 
 function setup.zellij(hk)
 	ze = Term:init({
-		cmd = ([[export PROJECT_DIR="$PWD"; (zellij attach {name} ||  zellij -s {name}) && zellij delete-session {name} || true ]]):fm({
-			name = [[${PWD//\//_}]],
-		}),
+    cmd = "bash " .. constants.bin_file("zellij.sh"),
 		border = "none",
 		auto_close = true,
 		dimensions = {
@@ -79,7 +77,7 @@ end
 
 function setup.projects(hk)
 	local t = cacheTerm("projects", {
-		cmd = [[dir=$(ff --cd) && nvim-lua --defer 10 -- "hot.action_open(v[1])" -- -s "$dir" || true]],
+    cmd = "bash " .. constants.bin_file("projects.sh"),
 		auto_close = true,
 		border = "none",
 		dimensions = {

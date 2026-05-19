@@ -28,7 +28,7 @@ __ff_action() {
     __ff_action query "select format('%-20s (%s)', name, id) from projects order by last_opened desc" || true
     ;;
   yazi-project)
-    cd $(__ff_action get-path-project "$1") 
+    cd $(__ff_action get-path-project "$1")
     tere yazi
     ;;
   sync-db)
@@ -50,8 +50,14 @@ __ff_action() {
     id=$(__ff_action get-project-id "$1")
     dir=$(__ff_action get-path-project "$1")
     __ff_action query "update projects set last_opened = datetime('now', 'localtime') where id = $id"
-    cd "$dir" && $EDITOR .
-    clear
+    if [[ -z "$EDITOR" ]]; then
+      if [[ -n "$VISUAL" ]]; then
+        EDITOR="$VISUAL"
+      else
+        EDITOR="nvim"
+      fi
+    fi
+    cd "$dir" && SHELL="$OLD_SHELL" $EDITOR .
     ;;
   update-project)
     id=$(__ff_action get-project-id "$1")
@@ -91,10 +97,13 @@ __ff_action() {
     zellij ls | grep -P "^(\x1b\[[0-9;]*m)?\Q${dir//\//\\}\E"
     ;;
   new-project)
-    dir=$(__ff_action yazi-pick-dir "$HOME")
+    dir="$1"
+    if [[ -z "$dir" ]]; then
+      dir=$(__ff_action yazi-pick-dir "$HOME")
+    fi
     if [[ -n "$dir" ]]; then
       echo "$dir"
-      read -p "Enter project name: " name
+      name=$(gum input --placeholder "Enter your project name..." --value $(basename $dir))
       if [[ -n "$name" ]]; then
         __ff_action query "insert into projects (name, path) values ('$name', '$dir')"
       fi
@@ -118,6 +127,10 @@ ff() {
   p | project)
     act=project
     ;;
+  --add-project)
+    __ff_action new-project "$PWD" || exit 1
+    exit 0
+    ;;
   f | file)
     act=file
     ;;
@@ -131,7 +144,7 @@ ff() {
     on_enter="become(__ff_action get-path-project {})"
     prompt_p="Dirrectory"
     shift 1
-      ;;
+    ;;
   *)
     act=project
     ;;
@@ -162,6 +175,7 @@ ff() {
 
 export -f ff
 export -f __ff_action
-
-export SHELL=$(which bash)
+BASH_SHELL=$(which bash)
+export OLD_SHELL=$SHELL
+export SHELL=$BASH_SHELL
 ff "$@"

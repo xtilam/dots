@@ -5,14 +5,12 @@ keybinds clear-defaults=true {
 		}
 	}
 	pane {
-    bind "r" {
-      Run "sh" "kitty_zellij_reload.sh" {
-        close_on_exit true
-      }
-    }
-		bind "z" {
+		bind "r" {
 			SwitchToMode "renamepane"
 			PaneNameInput 0
+		}
+		bind "s" {
+			SwitchToMode "session"
 		}
 		bind "w" {
 			CloseFocus
@@ -142,7 +140,7 @@ keybinds clear-defaults=true {
 		bind "s" {
 			ToggleActiveSyncTab
 		}
-		bind "x" {
+		bind "w" {
 			CloseTab
 		}
 	}
@@ -287,10 +285,13 @@ keybinds clear-defaults=true {
 		}
 		bind "p" {
 			LaunchOrFocusPlugin "plugin-manager" {
-				floating true
 				move_to_focused_tab true
 			}
 			SwitchToMode "normal"
+		}
+		bind "r" {
+			LaunchOrFocusPlugin "zis" {
+			}
 		}
 		bind "w" {
 			LaunchOrFocusPlugin "session-manager" {
@@ -300,37 +301,58 @@ keybinds clear-defaults=true {
 			SwitchToMode "normal"
 		}
 	}
-  shared_except "normal" "locked" {
+	shared_except "normal" "locked" {
 		bind "Tab" {
 			SwitchFocus
 		}
-  }
+	}
 	shared_except "locked" {
-    bind "Alt j" {
-      HalfPageScrollDown
-    }
-    bind "Alt k" {
-      HalfPageScrollUp
-    }
+		bind "Alt Shift t" {
+			TogglePaneFrames
+		}
+		bind "alt shift h" {
+			Resize "Left"
+		}
+		bind "alt shift l" {
+			Resize "Right"
+		}
+		bind "alt shift j" {
+			Resize "Down"
+		}
+		bind "alt shift k" {
+			Resize "Up"
+		}
+		bind "alt shift -" {
+			Resize "Decrease"
+		}
+		bind "alt shift =" {
+			Resize "Increase"
+		}
+		bind "Alt j" {
+			HalfPageScrollDown
+		}
+		bind "Alt k" {
+			HalfPageScrollUp
+		}
 		bind "Alt u" {
 			SwitchFocus
 		}
-    bind "Alt h"{
-      MoveFocus "left" 
-    }
-    bind "Alt l"{
-      MoveFocus "right" 
-    }
-    bind "Alt j"{
-      MoveFocus "down" 
-    }
-    bind "Alt k"{
-      MoveFocus "up" 
-    }
+		bind "Alt h" {
+			MoveFocus "left"
+		}
+		bind "Alt l" {
+			MoveFocus "right"
+		}
+		bind "Alt j" {
+			MoveFocus "down"
+		}
+		bind "Alt k" {
+			MoveFocus "up"
+		}
 		bind "Alt i" {
 			ToggleFocusFullscreen
 		}
-		bind "Alt o" {
+		bind "Alt Space" {
 			ToggleFloatingPanes
 		}
 		bind "Alt g" {
@@ -364,6 +386,16 @@ keybinds clear-defaults=true {
 		}
 		bind "Alt y" {
 			GoToNextTab
+		}
+		bind "Alt tab" {
+			GoToNextTab
+		}
+		bind "Alt r" {
+      // zellij
+			// GoToNextTab
+			// plugin location="zis" {
+			// 	mode_normal "#[fg=black,bg=white] #[fg=black,bg=red]{name} #[fg=white,bg=black]"
+			// }
 		}
 	}
 	shared_except "normal" "locked" "entersearch" {
@@ -399,39 +431,53 @@ plugins {
 	welcome-screen location="zellij:session-manager" {
 		welcome_screen false
 	}
-}
-// Plugins to load in the background when a new session starts
-// eg. "file:/path/to/my-plugin.wasm"
-// eg. "https://example.com/my-plugin.wasm"
-load_plugins {
-	"file:~/.config/zellij/plugins/room.wasm" {
-		floating true
-		ignore_case true
-		quick_jump true
+	zis location="file:~/.config/zellij/plugins/zjstatus.wasm" {
+		format_center "{mode}"
+		format_space ""
+		border_enabled "false"
+		border_char "─"
+		border_format "#[fg=#6C7086]{char}"
+		mode_normal "#[fg=black,bg=white] #[fg=black,bg=white]{name} #[fg=white,bg=black]"
+		mode_tmux "#[fg=black,bg=red] #[fg=white,bg=red]{name} #[fg=red,bg=black]"
+		mode_default_to_mode "tmux"
+		format_left "#[fg=black,bg=blue,bold] {session} #[fg=blue,bg=#181825]{tabs}"
+		format_right "{datetime}"
+		format_space "#[bg=#181825]"
+		tab_normal "#[fg=#181825,bg=#4C4C59] #[fg=#000000,bg=#4C4C59]{index}  {name} #[fg=#4C4C59,bg=#181825]"
+		tab_normal_fullscreen "#[fg=#6C7086,bg=#181825] {index} {name} [] "
+		tab_normal_sync "#[fg=#6C7086,bg=#181825] {index} {name} <> "
+		tab_active "#[fg=#181825,bg=#ffffff,bold,italic] {index}  {name} #[fg=#ffffff,bg=#181825]"
+		tab_active_fullscreen "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} [] "
+		tab_active_sync "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} <> "
+		datetime "#[fg=black,bg=blue]#[fg=white,bg=blue] {format} "
+		datetime_format "%A, %d %b %H:%M"
+		datetime_timezone "Etc/GMT-7"
 	}
 }
 ui {
 	pane_frames false
 	tab_bar false
 }
+show_startup_tips false
+mouse_hover_effects false
 // Use a simplified UI without special fonts (arrow glyphs)
 // Options:
-//   - true
-//   - false (Default)
+//			- true
+//			- false (Default)
 //
 // simplified_ui true
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-// theme "dracula"
+theme "ao"
+default_layout "zis"
 // Choose the base input mode of zellij.
 // Default: normal
 //
 // default_mode "locked"
 // Choose the path to the default shell that zellij will use for opening new panes
-// Default: $SHELL
 //
-default_layout "fdefault"
+// default_layout "zi"
 // The folder in which Zellij will look for themes
 // (Requires restart)
 //
@@ -440,15 +486,15 @@ default_layout "fdefault"
 // On certain configurations, or terminals this could
 // potentially interfere with copying text.
 // Options:
-//   - true (default)
-//   - false
+//			- true (default)
+//			- false
 //
 mouse_mode true
 advanced_mouse_actions false
 // Toggle having pane frames around the panes
 // Options:
-//   - true (default, enabled)
-//   - false
+//			- true (default, enabled)
+//			- false
 //
 // pane_frames false
 // When attaching to an existing session with other users,
@@ -462,8 +508,8 @@ advanced_mouse_actions false
 // eg. when terminal window with an active zellij session is closed
 // (Requires restart)
 // Options:
-//   - detach (Default)
-//   - quit
+//			- detach (Default)
+//			- quit
 //
 // on_force_close "quit"
 // Configure the scroll back buffer size
@@ -481,16 +527,16 @@ advanced_mouse_actions false
 // Examples:
 //
 // copy_command "xclip -selection clipboard" // x11
-// copy_command "wl-copy"                    // wayland
-// copy_command "pbcopy"                     // osx
+// copy_command "wl-copy"																				// wayland
+// copy_command "pbcopy"																					// osx
 //
 // copy_command "pbcopy"
 // Choose the destination for copied text
 // Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
 // Does not apply when using copy_command.
 // Options:
-//   - system (default)
-//   - primary
+//			- system (default)
+//			- primary
 //
 // copy_clipboard "primary"
 // Enable automatic copying (and clearing) of selection when releasing mouse
@@ -515,20 +561,20 @@ scrollback_editor "nvim"
 // attach_to_session true
 // Toggle between having Zellij layout panes according to a predefined set of layouts whenever possible
 // Options:
-//   - true (default)
-//   - false
+//			- true (default)
+//			- false
 //
 // auto_layout false
 // Whether sessions should be serialized to the cache folder (including their tabs/panes, cwds and running commands) so that they can later be resurrected
 // Options:
-//   - true (default)
-//   - false
+//			- true (default)
+//			- false
 //
 // session_serialization false
 // Whether pane viewports are serialized along with the session, default is false
 // Options:
-//   - true
-//   - false (default)
+//			- true
+//			- false (default)
 //
 // serialize_pane_viewport false
 // Scrollback lines to serialize along with the pane viewport when serializing sessions, 0
@@ -537,7 +583,7 @@ scrollback_editor "nvim"
 //
 // scrollback_lines_to_serialize 10000
 scrollback_lines 0
-// Enable or disable the rendering of styled and colored underlines (undercurl).
+	// Enable or disable the rendering of styled and colored underlines (undercurl).
 // May need to be disabled for certain unsupported terminals
 // (Requires restart)
 // Default: true
@@ -564,16 +610,14 @@ scrollback_lines 0
 // Whether to show tips on startup
 // Default: true
 //
-show_startup_tips false
- // Whether to show release notes on first version run
+	// Whether to show release notes on first version run
 // Default: true
 // 
 
 // show_release_notes false
 
 // ui {
-//     pane_frames {
-//         hide_session_name true
-//     }
+//					pane_frames {
+//									hide_session_name true
+//					}
 // }
-
